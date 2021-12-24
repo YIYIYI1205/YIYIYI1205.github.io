@@ -1,3 +1,13 @@
-# Headline
+# 需要看的内容
 
-> An awesome project.
+- Webpack
+- TS 
+- Node还没看完
+- Vite
+- react-router6
+- Umi
+- Next.js
+- Dva
+- saga
+- Vue原理
+- react生命周期
