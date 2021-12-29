@@ -4,7 +4,20 @@
 - `` ESLint ``使用`` AST ``去分析代码中的模式
 ```
 {
-    "max-len":["error", {"code: 80"}]
+    "max-len":["error", {"code: 80"}],
 }
+```
+.eslintrc.js
+```
+    module.exports = {
+        root: true,
+        env: {
+            node: true,
+        },
+        rulers: {
+            "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+            "no-debbgur": process.env.NODE_ENV === "production" ? "warn" : "off"
+        }
+    }
 ```
   

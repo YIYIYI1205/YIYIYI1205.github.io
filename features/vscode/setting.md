@@ -7,5 +7,18 @@
 "editor.codeActionsOnSave": { // 每次保存的时候代码自动化检测
     "source.fixAll.eslint": true
 }
-
+// 添加支持
+"eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue-html",
+    "html",
+    "vue"
+]
+"prettier.semi": false, // 去掉代码结尾的分号
+"prettier.singleQuote": true, // 使用单引号替代双引号
+"prettier.trailingComma": "none", // 去掉代码结尾的逗号
+"javascript.format.insertSpaceBeforeFunctionParenthesis": true, // 让函数名和后面的括号之间加个空格
+"vetur.format.defaultFormatter.html": "js-beatify-html",
+"vetur.format.defaultFormatter.js": "vscode-typescript", // 让vue中的js按编译器自带的ts格式进行格式化
 ```

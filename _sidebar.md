@@ -1,5 +1,5 @@
 - 前端工程化
-    - webpack相关
+    - 1.webpack相关
       - [1.webpack运行时](engineering/webpack/runtime)
       - [2.code spliting(未掌握)](engineering/webpack/codeSpliting)
       - [3.json/image打包](engineering/webpack/json&image)
@@ -7,12 +7,15 @@
       - [5.资源注入html](engineering/webpack/html)
       - [6.热模块替换HMR](engineering/webpack/HMR)
       - [7.提升构建性能](engineering/webpack/speed)
+    - [2.vite相关](engineering/vite.md)
 - 功能性相关
     - 代码格式化
       - [1.ESLint](features/format/eslint.md)
       - [2.Prettier](features/format/prettier.md)
     - VSCode
       - [1.Debug](features/vscode/debug.md)
+- http
+    - [1.强缓存与协商缓存](http/cache.md)
 - 问题
     - [1.js相关](question/js.md)
     - [2.服务端渲染相关](question/server.md)
