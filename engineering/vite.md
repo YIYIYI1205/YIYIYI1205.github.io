@@ -54,3 +54,38 @@ export default defineConfig({
   
 })
 ```
+
+
+
+- 试一下别名
+- - vue3 试用script setup直接引入模块
+- vue中`` <style scope> ``(使用`` class='logo' ``)和`` <style module> ``(`` :class='$style.logo' ``)的区别
+    模块化更优，类名hash，可以直接给模块的样式文件命名xx.module.css，import classname from 'xx.module.css' 等同于<style module>；scope会给元素加data-v
+    
+
+- npm i -D sass，不需要配loader，由插件来实现
+- <style lang='scss'> 
+- post-css用来加前缀，直接配置postcss.config.js即可直接生效，npm i autoprefixer -D
+- ```
+    module.exports = {
+      plugins: [require('autoprefixer')]
+    }
+- ```
+- 用flex测试一下
+- ts: <script lang='ts'>，可以在tsconfig.json中加配置
+- 代理：vite.config.js
+  ```
+    export default{
+      server:{
+        proxy: {
+          '/api':{
+            target: 'xxx',
+            changeOrigin: true,
+            rewrite:path => path.replace(/^\/api/, '')
+          }
+        }
+      }
+    }
+  ```
+
+  - mock 
