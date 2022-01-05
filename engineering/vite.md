@@ -1,12 +1,13 @@
 # vite
-[官网](https://vitejs.cn/)
-- 基于`` ESM ``的`` Dev Server `` + `` HMR ``（开发环境不进行打包）
-- 基于`` esbuild ``的依赖预优化
-- 基于`` Rollup ``的`` Plugins ``+`` Bundle ``（生产环境Rollup打包）
-- `` SSR ``（服务端渲染）
+  [官网](https://vitejs.cn/)
+  - 基于`` ESM ``的`` Dev Server `` + `` HMR ``（开发环境不进行打包）
+  - 基于`` esbuild ``的依赖预优化
+  - 基于`` Rollup ``的`` Plugins ``+`` Bundle ``（生产环境Rollup打包）
+  - `` SSR ``（服务端渲染）
 ## 为什么选vite
-现有问题：使用`` JavaScript ``开发的工具通常需要很长时间（甚至是几分钟！）才能启动开发服务器，即使使用 HMR，文件修改后的效果也需要几秒钟才能在浏览器中反映出来。如此循环往复，迟钝的反馈会极大地影响开发者的开发效率和幸福感。
-项目变大，`` Bundle ``的启动时间变长，`` HMR ``时间变长。`` Dev Server ``必须等待所有模块构建完成。
+
+  现有问题：使用`` JavaScript ``开发的工具通常需要很长时间（甚至是几分钟！）才能启动开发服务器，即使使用 HMR，文件修改后的效果也需要几秒钟才能在浏览器中反映出来。如此循环往复，迟钝的反馈会极大地影响开发者的开发效率和幸福感。
+  项目变大，`` Bundle ``的启动时间变长，`` HMR ``时间变长。`` Dev Server ``必须等待所有模块构建完成。
 
 `` bundle ``是`` webpack ``打包出来的文件，`` chunk ``是代码块，一个`` chunk ``由多个模块组合而成，`` module ``是单个模块。`` module ``，`` chunk ``和`` bundle ``其实就是同一份逻辑代码在不同转换场景下的取了三个名字：直接写出来的是`` module ``，`` webpack ``处理时是`` chunk ``，最后生成浏览器可以直接运行的`` bundle ``。
 
@@ -22,8 +23,7 @@
 4. 仍然需要打包：基于`` Rollup ``的`` Plugins ``+`` Bundle ``
 
 
-
-## 搭建项目
+## 使用
 ### 初始化
 ```
 // npm
@@ -38,19 +38,24 @@ $ pnpm create vite
 ### 启动
 看`` package.json ``
 
-### 配置别名
-```
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path/posix'
+### 注意点
+1. 引入一个静态资源会返回解析后的公共路径(可以直接看元素的地址是绝对路径)（似乎所有的相对地址都被解析成了绝对地址）
+    ```import logo from './assets/logo.png' //输出/src/assets/logo.png```
+2. 配置别名
+  ```
+  import { defineConfig } from 'vite'
+  import react from '@vitejs/plugin-react'
+  import HelloWorld from 'cocompsmps/HelloWorld'
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, 'src')
+  export default defineConfig({
+    plugins: [react()],
+    resolve: {
+      alias: {
+        "@": resolve('./src'),
+        "comps": resolve('./src/components')
+      }
     }
-  }
-  
-})
-```
+    
+  })
+  ```
+3. 

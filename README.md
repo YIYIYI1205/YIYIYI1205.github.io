@@ -11,3 +11,4 @@
 - saga
 - Vue原理
 - react生命周期
+- 实现sleep
