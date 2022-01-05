@@ -24,6 +24,23 @@
 3. `` HMR ``优化：编辑一个文件时，`` Vite ``只需要精确地使已编辑的模块与其最近的`` HMR ``边界之间的链失活；`` Vite ``同时利用 `` HTTP ``头来加速整个页面的重新加载。源码模块的请求会根据`` 304 Not Modified ``进行协商缓存，而依赖模块请求则会通过`` Cache-Control: max-age=31536000,immutable ``进行强缓存，因此一旦被缓存它们将不需要再次请求。
 4. 仍然需要打包：基于`` Rollup ``的`` Plugins ``+`` Bundle ``
 
+## [插件](https://vitejs.cn/guide/api-plugin.html#simple-examples)
+> 基于Rollup
+```
+      export default definedConfig({
+        // vue是系统插件，viteMockServe是用户插件
+        plugins: [vue(), viteMockServe({})]
+      })
+```
+### [通用钩子](https://vitejs.cn/guide/api-plugin.html#transforming-custom-file-types)
+ - config: 修改vite配置
+ - configResolved: vite配置确认，只能读不能改
+ - configServer: 用于配置dev server，可以做中间件，例如实现viteMockServe
+ - transformIndexHtml: 用于修改宿主页面
+ - resolveId: 确定插件名字，是否接管
+ - load: 接管后返回什么
+ - transform: 将load进来的代码块进一步加工处理
+
 
 ## 使用
 ### 初始化
