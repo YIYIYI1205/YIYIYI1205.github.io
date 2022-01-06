@@ -58,3 +58,20 @@ static getDerivedStateFromProps(nextProps, prevState) {
 - 锚点跳转
   1. 搜索框跳转：在onslect函数中判断如果当前path不变，执行滚动事件；但是当页面跳转时，找不到ele，需要配合path中componentDidUpdate监听path是否变化，变化后持续找ele，然后进行跳转，此时不需要setInterval
   2. hash不存在跳转时，需要滚到window.scrollTo(0,0)
+
+
+
+forEach不支持await  要用for of
+
+同步方法写成异步，可能会影响
+
+isNaN(+tem)  强制转换成数字
+
+
+3.for...of优势
+
+​ ​有着同for...in一样简洁的语法，但没有for...in的那些缺点
+
+​不同forEach方法，可以用break,continue,return配合使用
+
+​提供了变量所有数据结构的统一操作接口

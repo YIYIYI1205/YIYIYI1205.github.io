@@ -24,6 +24,9 @@
 3. `` HMR ``优化：编辑一个文件时，`` Vite ``只需要精确地使已编辑的模块与其最近的`` HMR ``边界之间的链失活；`` Vite ``同时利用 `` HTTP ``头来加速整个页面的重新加载。源码模块的请求会根据`` 304 Not Modified ``进行协商缓存，而依赖模块请求则会通过`` Cache-Control: max-age=31536000,immutable ``进行强缓存，因此一旦被缓存它们将不需要再次请求。
 4. 仍然需要打包：基于`` Rollup ``的`` Plugins ``+`` Bundle ``
 
+
+## 原理
+`` <script type='module'> ``，可以使用`` es6 ``，便于开发，打包时可以降级。
 ## [插件](https://vitejs.cn/guide/api-plugin.html#simple-examples)
 > 基于Rollup
 ```
