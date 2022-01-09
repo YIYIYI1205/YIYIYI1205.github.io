@@ -1,3 +1,7 @@
+- JavaScript
+    - 1.JavaScript高级程序设计(第4版)
+      - [1.简介](javascript/javascriptBook/readme.md)
+      - [2.script标签](javascript/javascriptBook/script.md)
 - 前端工程化
     - 1.webpack相关
       - [1.webpack运行时](engineering/webpack/runtime)
