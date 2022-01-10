@@ -38,13 +38,74 @@
 
 像`` if ``等流控制语句会自动执行其他类型值到布尔值的转换。
 
-| 数据类型 | 转换为`` true ``的值 | 转换为`` false ``的值 |
-| :------| ------: | :------: |
-| Boolean | true | false |
-| String | 非空字符串 | ""(空字符串) |
-| Number | 非零数值(包括无穷值) | 0、NaN |
-| Object | 任意对象 | null |
-| Undefined | N/A(不存在) | undefined |
+| 数据类型  | 转换为`` true ``的值 | 转换为`` false ``的值 |
+| :-------- | -------------------: | :-------------------: |
+| Boolean   |                 true |         false         |
+| String    |           非空字符串 |     ""(空字符串)      |
+| Number    | 非零数值(包括无穷值) |        0、NaN         |
+| Object    |             任意对象 |         null          |
+| Undefined |          N/A(不存在) |       undefined       |
+
+#### Number
+
+##### 浮点数
+
+浮点值的精确度最高可达`` 17 ``位小数，但在算术计算中远不如整数精确。例如，`` 0.1 ``加`` 0.2 ``得到的不是`` 0.3 ``。
+
+##### NaN
+
+  ``` console.log(NaN == NaN); // false ```
+
+  - `` isNaN() ``判断参数是否不是数值
+
+    ```
+        console.log(isNaN(NaN));     // true
+        console.log(isNaN(10));      // false，10 是数值
+        console.log(isNaN("10"));    // false，可以转换为数值10 
+        console.log(isNaN("blue"));  // true，不可以转换为数值
+        console.log(isNaN(true));    // false，可以转换为数值1
+    ```
+
+##### 数值转换
+
+- 将非数值转换为数值: `` Number() ``、`` parseInt() ``和`` parseFloat()``。
+  
+###### Number()转换
+  
+  | 数据类型  | 转换为`` 1 ``的值 | 转换为`` 0 ``的值 | 转换为`` NaN ``的值 |
+  | :-------- | ----------------: | :---------------: | :-----------------: |
+  | 布尔值    |              true |       false       |     N/A(不存在)     |
+  | null      |       N/A(不存在) |       null        |     N/A(不存在)     |
+  | undefined |       N/A(不存在) |    N/A(不存在)    |      undefined      |
+  | string    |               '1' | '0',""(空字符串)  |    包含其它字符     |
+
+  - `` Object ``: 调用`` valueOf() ``方法，如果转换结果是`` NaN ``，则调用`` toString() ``方法，再按照转换字符串的规则转换。
+
+```
+let num1 = Number("Hello world!");  // NaN
+let num2 = Number("");              // 0
+let num3 = Number("000011");        // 11
+let num4 = Number(true);            // 1
+// 0 // 11 // 1
+```
+
+###### parseInt()转换
+
+ - `` parseInt('') ``会得到`` NaN ``
+ - 以数字开头的`` string ``会被转换为开头的数字
+ - `` parseInt('') ``的第二个参数用于制定进制数。可以用来将某进制转化为十进制。`` parseInt("AF", 16);  //175``。
+
+###### parseFloat()转换
+
+- 第一次出现的小数点是有效的，但第二次出现的小数点就无效了，此时字符串的剩余字符都会被忽略。
+- `` parseFloat() ``只解析十进制值，因此不能指定底数。
+
 
 
 Symbol(符号)是 ECMAScript 6 新增的。还有一种复杂数据类型叫 Object(对 象)。Object 是一种无序名值对的集合。
+
+
+
+#### String
+
+- `` ECMAScript ``中的字符串是不可变的(`` immutable ``)，意思是一旦创建，它们的值就不能变了。要修改 某个变量中的字符串值，必须先销毁原始的字符串，然后将包含新值的另一个字符串保存到该变量。
