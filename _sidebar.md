@@ -3,6 +3,7 @@
       - [1.简介](javascript/javascriptBook/readme.md)
       - [2.script标签](javascript/javascriptBook/script.md)
       - [3.语言基础](javascript/javascriptBook/language.md)
+      - [4.4](javascript/javascriptBook/4.md)
 - 前端工程化
     - 1.webpack相关
       - [1.webpack运行时](engineering/webpack/runtime)
