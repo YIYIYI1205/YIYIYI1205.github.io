@@ -109,3 +109,47 @@ Symbol(符号)是 ECMAScript 6 新增的。还有一种复杂数据类型叫 Obj
 #### String
 
 - `` ECMAScript ``中的字符串是不可变的(`` immutable ``)，意思是一旦创建，它们的值就不能变了。要修改 某个变量中的字符串值，必须先销毁原始的字符串，然后将包含新值的另一个字符串保存到该变量。
+
+
+标签函数会接收被插值记号分隔后的模板和对每个表达式求值的结果。
+``` 
+let a = 6;
+let b = 9;
+function simpleTag(strings, ...expressions) {
+  console.log(strings);
+  for(const expression of expressions) {
+    console.log(expression);
+  }
+  return 'foobar';
+}
+// 第一个参数是将
+let taggedResult = simpleTag`${ a } + ${ b } = ${ a + b }`;
+// ["", " + ", " = ", ""]
+// 6
+// 9
+// 15
+console.log(taggedResult);  // "foobar"
+```
+
+##### 原始字符串
+
+- `` String.raw ``标签函数可以直接获取原始的模板字面量内容。
+
+
+#### Symbol 类型
+
+- 可以表示独一无二的值，比如定义对象的唯一属性名并且不会被`` Object.keys ``或者`` for...in ``或者`` JSON.stringify() ``遍历到保护个别隐私属性，定义不会重复的常量。
+- `` Symbol() ``函数不能与`` new ``关键字一起作为构造函数使用。
+- `` Symbol(description) ``，`` description ``用于调式，不是`` Symbol ``的值。
+- 每一个`` Symbol ``类型数据都独一无二，不能划等号。 
+- `` Symbol ``不能和其它值参与运算。
+- `` Symbol ``可以显式地转为字符串，布尔值，但是不能转为数字。
+  ```
+  const s = Symbol()
+  const a = {}
+  a[s] = 'hello'
+  const b = {
+    [Symbol()]: 'hello'
+  }
+  console.log(a[s])
+  ```
