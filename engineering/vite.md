@@ -26,7 +26,10 @@
 
 
 ## 原理
-`` <script type='module'> ``，可以使用`` es6 ``，便于开发，打包时可以降级。
+- `` <script type='module'> ``，可以使用`` es6 ``，便于开发，打包时可以降级。
+- 第三方依赖进行预打包（esbuild）
+- 第三方依赖协商缓存，源码强缓存
+
 ## [插件](https://vitejs.cn/guide/api-plugin.html#simple-examples)
 > 基于Rollup
 ```

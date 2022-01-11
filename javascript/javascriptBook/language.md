@@ -102,10 +102,41 @@ let num4 = Number(true);            // 1
 
 
 
-Symbol(符号)是 ECMAScript 6 新增的。还有一种复杂数据类型叫 Object(对 象)。Object 是一种无序名值对的集合。
+
 
 
 
 #### String
 
-- `` ECMAScript ``中的字符串是不可变的(`` immutable ``)，意思是一旦创建，它们的值就不能变了。要修改 某个变量中的字符串值，必须先销毁原始的字符串，然后将包含新值的另一个字符串保存到该变量。
+- `` ECMAScript ``中的字符串是[不可变](https://www.jianshu.com/p/15ed1a4c35d8)的(`` immutable ``)，意思是一旦创建，它们的值就不能变了。要修改 某个变量中的字符串值，必须先销毁原始的字符串，然后将包含新值的另一个字符串保存到该变量。
+
+    ```
+    var statement = "I am an immutable value";
+    var otherStr = statement.slice(8, 17);
+    ```
+    没有字符串方法可以改变他们操作的字符串，它们都是返回新的字符串。
+    数字也是不变的。
+
+##### 转换为字符串
+
+###### toString()
+
+- 用途就是返回当前值的字符串等价物。
+- `` toString() ``方法可见于数值、布尔值、对象和字符串值。`` null ``和`` undefined ``值没有`` toString() ``方法。
+- 数值调用时，可以传参制定进制数。
+  
+###### String()
+
+- 如果值有`` toString() ``方法，则调用该方法（不传参数）并返回结果。
+- 如果值是`` null ``，返回`` "null" ``。
+- 如果值是`` undefined ``，返回`` "undefined" ``。
+
+
+##### 模板字面量
+
+###### 模板字面量标签函数
+
+String.raw
+
+
+Symbol(符号)是 ECMAScript 6 新增的。还有一种复杂数据类型叫 Object(对 象)。Object 是一种无序名值对的集合。
