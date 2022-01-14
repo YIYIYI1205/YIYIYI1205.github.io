@@ -32,7 +32,7 @@
 
 ## [插件](https://vitejs.cn/guide/api-plugin.html#simple-examples)
 > 基于Rollup
-```
+```javascript
       export default definedConfig({
         // vue是系统插件，viteMockServe是用户插件
         plugins: [vue(), viteMockServe({})]
@@ -67,7 +67,7 @@ $ pnpm create vite
 1. 引入一个[静态资源](https://vitejs.cn/guide/assets.html#importing-asset-as-url)会返回解析后的公共路径（所有的相对地址都被解析成了绝对地址）
     ```import logo from './assets/logo.png' //输出/src/assets/logo.png```
 2. [配置别名](https://vitejs.cn/config/#resolve-alias)
-  ```
+  ```javascript
 // vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -93,14 +93,14 @@ background: url('@/logo.svg');
    `` scope ``方式会给元素添加`` data-v ``属性
 5. 使用[`` sass ``](https://vitejs.cn/guide/features.html#css-pre-processors)：`` npm i -D sass ``，不需要配`` loader ``，由插件来实现。使用：`` <style lang='scss'> ``
 6. `` post-css ``用来加前缀，直接配置`` postcss.config.js ``即可直接生效，`` npm i autoprefixer -D ``
-  ```
+  ```javascript
     module.exports = {
       plugins: [require('autoprefixer')]
     }
   ```
 7. [`` ts ``](https://vitejs.cn/guide/features.html#typescript): `` <script lang='ts'> ``，可以在`` tsconfig.json ``中加配置
 8. [代理](https://vitejs.cn/config/#server-proxy)：
-  ```
+  ```javascript
     // vite.config.js
     export default{
       server:{
@@ -115,7 +115,7 @@ background: url('@/logo.svg');
     }
   ```
 9. `` mock ``：`` npm i mockjs -S ``和`` npm i vite-plugin-mock -D ``，配置`` vite.config.js ``，创建`` mock ``目录
-    ```
+    ```javascript
       // vite.config.js
       import {viteMockServe} from 'vite-plugin-mock'
       export default definedConfig({

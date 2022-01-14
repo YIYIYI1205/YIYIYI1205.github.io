@@ -6,7 +6,7 @@
 3. `` _webpack_require(0) ``：运行`` _webpack_modules ``第一个模块，引入模块的地方会被解析成`` webpack_require(moduleId) ``。
 
 build.js
-```
+```javascript
 const webpack = require("webpack");
 const path = require("path");
 function f1() {
@@ -23,17 +23,17 @@ f1().run((err, stat) => {});
 ```
 
 sum.js
-```
+```javascript
 module.exports = (...args) => args.reduce((x, y) => x + y, 0);
 ```
 
 add.js
-```
+```javascript
 module.exports = () => {console.log('add')}
 ```
 
 主函数index.js
-```
+```javascript
 const sum = require('./sum')
 console.log(sum(3, 8));
 const add = require('./add')
@@ -46,7 +46,7 @@ node index.js
 ```
 
 webpack打包后dist/main.js
-```
+```javascript
 /******/ var __webpack_modules__ = ([
 /* 0 */,
 /* 1 */

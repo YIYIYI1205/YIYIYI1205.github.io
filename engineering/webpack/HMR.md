@@ -4,7 +4,7 @@
 - 在`` webpack ``的运行时中`` __webpack__modules__ ``用以维护所有的模块。热模块替换的原理，即通过`` chunk ``的方式加载最新的`` modules ``，找到`` __webpack__modules__ ``中对应的模块逐一替换，并删除其上下缓存。
   
 编译后的代码
-```
+```javascript
 const __webpack_modules = [
   (module, exports, __webpack_require__) => {
     __webpack_require__(0);

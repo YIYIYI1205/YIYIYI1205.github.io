@@ -3,7 +3,7 @@
   .prettierrc.json
   .prettierrc
   优先级高于setting.json
-```
+```javascript
     {
         printWidth: 80, 
         "semi": false, // 不要分号

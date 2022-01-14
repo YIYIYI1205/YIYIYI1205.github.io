@@ -8,7 +8,7 @@
 - 使用`` DOM API ``加载`` css ``资源，由于`` css ``需要在`` js ``资源加载完通过`` DOM API ``控制加载，容易出现页面抖动，在线上低效，这时候需要`` mini-css-extract-plugin ``单独抽离，再通过`` html-webpack-plugin ``引入到`` html ``中。
   
 打包文件
-```
+```javascript
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin')

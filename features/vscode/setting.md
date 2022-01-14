@@ -1,5 +1,5 @@
 # 配置首选项
-```
+```javascript
 "editor.fontFamily": "Fira Code, Consolas", // 调整字体，Fira Code
 "editor.detectIndentation": false, //vscode默认启用了根据文件类型自动设置tabsize的选项
 "editor.tabSize": 4, // 重新设定tabsize

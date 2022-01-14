@@ -1,7 +1,7 @@
  - 永久切换：nvm alias default 4.6.0
  - 旺哥的服务端渲染，也会去渲染renderView中的内容
  - 监听元素是否存在
-  ```
+  ```javascript
     observe = (selector, callback) => {
     let startTime = Date.now();
     // 检测超时, 最长 30s
@@ -41,7 +41,7 @@
 
 
 -  react 监听数据变化
-```
+```javascript
 static getDerivedStateFromProps(nextProps, prevState) {
     const {type} = nextProps;
     // 当传入的type发生变化的时候，更新state
@@ -75,3 +75,6 @@ isNaN(+tem)  强制转换成数字
 ​不同forEach方法，可以用break,continue,return配合使用
 
 ​提供了变量所有数据结构的统一操作接口
+
+
+react hook context

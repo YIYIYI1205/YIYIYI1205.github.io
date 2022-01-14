@@ -2,14 +2,14 @@
 [视频](https://www.bilibili.com/video/BV1FS4y1971G)
 
 手写一个json-loader：index.js
-```
+```javascript
 module.exports = function (source) {
   const json = typeof source === "string" ? source : JSON.stringify(source);
   return `module.exports = ${json}`;
 };
 ```
 打包配置：dist/build.js
-```
+```javascript
 const webpack = require("webpack");
 const compiler = webpack({
     entry: './index.js',
@@ -31,7 +31,7 @@ compiler.run(() => {
 ```
 
 需要被打包的文件：dist/user.json3
-```
+```javascript
 {
     a: 1
 }
