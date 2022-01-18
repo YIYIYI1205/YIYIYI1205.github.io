@@ -51,7 +51,7 @@
 
 ## useContext(传参)
 
-- 创建：`` const CountContext = createContext() ``
+- 创建：`` const CountContext = createContext(defaultValue) ``，只有当组件所处的树中没有匹配到`` Provider ``时，其`` defaultValue ``参数才会生效。`` createContext ``不是`` hooks ``，`` hooks ``是在函数中才可以使用。
 - 父组件传值：`` <CountContext.Provider value={count}>放子组件</CountContext.Provider>``
 - 子组件接收：`` const count = useContext(CountContext) ``(`` import ``可以循环嵌套，在父组件中导出`` context ``，在子组件中``  useContext ``即可)
 - 不需要逐级传递，可实现多级传递。
@@ -59,32 +59,82 @@
 ## useReducer
 
 - 使用：`` useReducer ``传入一个`` reducer ``函数以及`` state ``的初始值
+- `` useReducer + useContext ``实现`` redux ``。
+
+<details>
+
+<summary>例子</summary>
 
 ```javascript
-import { useReducer } from 'react'
-function ReducerDemo(){
-    const [count, dispatch] = useReducer((state, action) => {
-        switch(action) {
-            case 'add':
-                return state + 1
-            case 'sub':
-                return state - 1
-            default:
-                return state
-        }
-    }, 0)
-    return (
+// index.js
+import { createContext } from 'react'
+import ShowArea from './showArea'
+import Buttons from './buttons'
+export const ColorContext = createContext({})
+export default function Index() {
+  return (
+    <ColorContext.Provider value={{ color: 'blue' }}>
+      <ShowArea />
+      <Buttons />
+    </ColorContext.Provider>
+  )
+}
+
+// 另一种写法 index.js
+import Color from './color'
+import ShowArea from './showArea'
+import Buttons from './buttons'
+export default function Index() {
+    return(
+        <Color>
+            <ShowArea />
+            <Buttons />
+        </Color>
+    )
+}
+
+// color.js
+import { createContext, useReducer } from 'react'
+export const ColorContext = createContext({})
+export UPDATE_COLOR = 'UPDATE_COLOR'
+const reducer = (state, action) =>{
+    switch(action.type) {
+        case UPDATE_COLOR:
+            return action.color
+        default
+            return state
+    }
+}
+export default function Color(props) {
+    const [ color, dispatch ] = useReducer(reducer, 'blue')
+    return(
+        <ColorContext.Provider value={{color, dispatch}}>
+            {props.children}
+        </ColorContext.Provider>
+    )
+}
+
+// showArea.js
+import { useContext } from 'react'
+import { ColorContext } from './color'
+export default function ShowArea() {
+    const { color } = useContext(ColorContext)
+    return(
+        <div style={{color}}>{color}</div>
+    )
+}
+
+// buttons.js
+import { useContext}
+import { UPDATE_COLOR, ColorContext } from './color'
+export default function Buttons() {
+    const { dispatch } = useContext(ColorContext)
+    return(
         <div>
-            <h2>{count}</h2>
-            <button onClick={() => {dispatch('add')}}>add</button>
-            <button onClick={() => {dispatch('sub')}}>sub</button>
+            <button onClick={() => dispatch({color: 'red', type: UPDATE_COLOR})}>红色</button>
         </div>
     )
 }
 ```
 
-```javascript 
-// color.js
-import
-
-```
+</details>
