@@ -18,7 +18,9 @@
 - `` componentDidMount ``：第一次组件渲染完成之后会执行。
 - `` componentDidUpdate ``：组件更新时会执行，`` useEffect ``传入第二个参数`` [状态] ``，会在该状态变化时才执行`` useEffect ``方法。
 - `` componentWillUnmount ``：第二个参数传入`` [] ``，会在组件销毁时执行`` return ``回调函数中的方法。
-  - 可以用路由举例，切换路由时，前一个路由销毁
+  
+<details>
+    <summary>可以用路由举例，切换路由时，前一个路由销毁</summary>
   
     ```javascript
     const [flag, setFlag] = useState(true)
@@ -46,6 +48,7 @@
     // 改变flag：任何销毁都会执行；flag销毁才执行这一行；任何改变都会执行；flag变化才执行这一行
     // 销毁组件：任何销毁都会执行；flag销毁才执行这一行；组件销毁才执行这一行
     ```
+</details>
 
 - 与`` componentDidMount ``或`` componentDidUpdate ``不同，使用`` useEffect ``调度的`` effect ``不会阻塞浏览器更新屏幕，这让你的应用看起来响应更快。大多数情况下，`` effect ``不需要同步地执行。在个别情况下（例如测量布局），有单独的`` useLayoutEffect Hook ``供你使用，其`` API ``与`` useEffect `` 相同。
 
@@ -138,3 +141,60 @@ export default function Buttons() {
 ```
 
 </details>
+
+## useMemo(重复渲染)
+
+- 父组件改变，子组件所有代码都会自动重新渲染，类组件中用`` shouldComponentUpdate ``解决，函数组件中用`` useMemo ``来解决。
+- 使用：`` useMemo(() => 方法, [状态])``。
+
+## useRef(获取dom)
+
+- 定义：`` const inputEl = useRef(null) ``
+- 使用：`` <input ref={inputEl} /> ``
+- 取值：`` inputEl.current.value ``
+- 保存变量：配合`` useEffect ``在变量变化时，保存数据在Ref中
+
+  ```
+    const [text, setText] = useState('')
+    const textRef = useRef()
+    useEffect(() => {
+        textRef.current = text
+    }, [text])
+    return(
+        <input ref={textRef} value={text} onChange={(e) => setText(e.target.value)} />
+    )
+  ```
+
+## useCallback
+
+## 自定义hooks函数
+
+```javascript
+function useWindowSize(){
+    const [size, setSize] = useState({
+        width: document.documentElement.clientWidth,
+        height: document.documentElement.clientHeight
+    })
+    const onResize = useCallback(() => {
+        setSize({
+            width: document.documentElement.clientWidth,
+            height: document.documentElement.clientHeight
+        })
+    }, [])
+    useEffect(() => {
+        window.addEventListener('resize', onResize)
+        return () => {
+            window.removeEventListener('resize', onResize)
+        }
+    }, [])
+    return size
+}
+
+function exmaple() {
+    const size = useWindowSize()
+    return (
+        <div>{size.width}</div>
+    )
+}
+
+```
