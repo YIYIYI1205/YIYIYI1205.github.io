@@ -1,7 +1,7 @@
  - 永久切换：nvm alias default 4.6.0
  - 旺哥的服务端渲染，也会去渲染renderView中的内容
  - 监听元素是否存在
-  ```javascript
+ ``javascript
     observe = (selector, callback) => {
     let startTime = Date.now();
     // 检测超时, 最长 30s
@@ -36,7 +36,7 @@
     }, 100);
   };
 
-  ```
+ ``
 
 
 

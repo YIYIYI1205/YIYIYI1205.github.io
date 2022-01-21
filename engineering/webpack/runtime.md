@@ -1,9 +1,9 @@
 # webpack 的 runtime
 [视频](https://www.bilibili.com/video/BV1o44y1Y7Zs)
 
-1. `` _webpack_modules ``是一个数组，存放所有`` require() ``引入的模块（第一个其实是入口模块，但是放在了最外面，入口模块也就是主函数），每个模块都由一个包裹函数`` (module, module.exports, _webpack_modules) ``对模块进行包裹。入口模块被解析为`` AST ``，根据`` AST ``深度优先搜索所有模块，构建出模块数组。
-2. `` _webpack_require(moduleId) ``手动实现加载一个模块，对已加载过的模块进行缓存，执行`` moduleId ``定位到`` webpack_modules ``中的包裹函数，执行并返回`` module.exports ``。
-3. `` _webpack_require(0) ``：运行`` _webpack_modules ``第一个模块，引入模块的地方会被解析成`` webpack_require(moduleId) ``。
+1. `_webpack_modules`是一个数组，存放所有`require()`引入的模块（第一个其实是入口模块，但是放在了最外面，入口模块也就是主函数），每个模块都由一个包裹函数`(module, module.exports, _webpack_modules)`对模块进行包裹。入口模块被解析为`AST`，根据`AST`深度优先搜索所有模块，构建出模块数组。
+2. `_webpack_require(moduleId)`手动实现加载一个模块，对已加载过的模块进行缓存，执行`moduleId`定位到`webpack_modules`中的包裹函数，执行并返回`module.exports`。
+3. `_webpack_require(0)`：运行`_webpack_modules`第一个模块，引入模块的地方会被解析成`webpack_require(moduleId)`。
 
 build.js
 ```javascript
