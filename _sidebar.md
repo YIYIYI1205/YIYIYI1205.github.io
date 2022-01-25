@@ -27,3 +27,6 @@
 - 问题
     - [1.js相关](question/js.md)
     - [2.服务端渲染相关](question/server.md)
+- 其它
+    - [1.未总结](other/readme.md)
+    - [2.uml](other/uml.md)
