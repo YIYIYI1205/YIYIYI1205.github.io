@@ -4,25 +4,25 @@
 
 ## useState(状态)
 
-- 声明和初始化状态：使用数组解构：`const [ 状态，改变状态的函数 ] = useState(初始值)`
+- 声明和初始化状态：使用数组解构：`const [ state，setState ] = useState(initialState)`，`setState`中可以有参数`prevState`表示前一个变量值。
 - 更新状态：改变状态的函数(将要改变成为的值)
 - 状态通过`useState`的顺序进行记录，不像`class`中的`this.setState`，更新`state`变量总是替换它而不是合并它。
 - 在函数退出（不是销毁，是执行完）后变量就会”消失”，而`state`中的变量会被`React`保留。
+- `React`使用`Object.is`比较算法来比较`state`。
 
 ## useEffect(生命周期)
 
 - 执行副作用：和函数业务主逻辑关系不大，在特定的时间执行或者事件中执行，例如请求数据、监听、手动修改`dom`等都会在生命周期中执行。
 - 由于副作用函数是在组件内声明的，所以它们可以访问到组件的`props`和`state`。默认情况下，`React`会在每次渲染后调用副作用函数 —— 包括第一次渲染的时候。
-- 使用：`useEffect(() => {})`
-- 异步方法，并会阻碍视图更新
+- 使用：`useEffect(() => {})`，`React`更新`DOM`之后运行一些额外的代码
 - `useEffect`中的`return`方法，会在销毁时执行，包括组件的销毁以及状态的销毁。会先执行`return`中的方法，再执行`useEffect`中内容。
-- `componentDidMount`：第一次组件渲染完成之后会执行。例如只在第一次请求接口。
+- `componentDidMount`：第一次组件渲染完成之后会执行(第一次`render`之后执行`componentDidMount`)。例如只在第一次请求接口。
 
     ```javascript
         useEffect(() => {
             axios('https://api.apiopen.top/recommendPoetry').then((res) => {
             setData(res)
-            console.log(data) // 由于setData不是同步方法，所以输出肯定还是{}，但是后面data只要改变，就会重新return渲染
+            console.log(data) // 由于setData不是同步方法，所以输出肯定还是{}，但是后面data只要改变，就会重新渲染
             })
         }, [])
         return <div>{data?.data?.result}</div>
@@ -32,6 +32,7 @@
 - `componentWillUnmount`：第二个参数传入`[]`，会在组件销毁时执行`return`回调函数中的方法。
 - `React`会保存你传递的函数（我们将它称之为`“effect”`），并且在执行`DOM`更新之后调用它。
 - `Hook`使用了`JavaScript`的闭包机制。
+- 传给`useEffect`的函数会在浏览器完成布局与绘制之后，在一个延迟事件中被调用。
 - `React`保证了每次运行`effect`的同时，`DOM`都已经更新完毕。
 - 每次我们重新渲染，都会生成新的`effect`，替换掉之前的。某种意义上讲，`effect`更像是渲染结果的一部分。
 - 返回函数作为`effect`可选的清除机制。每个`effect`都可以返回一个清除函数。
@@ -65,21 +66,37 @@
     // 改变flag：任何销毁都会执行；flag销毁才执行这一行；任何改变都会执行；flag变化才执行这一行
     // 销毁组件：任何销毁都会执行；flag销毁才执行这一行；组件销毁才执行这一行
    ```
+
 </details>
 
-- 与`componentDidMount`或`componentDidUpdate`不同，使用`useEffect`调度的`effect`不会阻塞浏览器更新屏幕，这让你的应用看起来响应更快。大多数情况下，`effect`不需要同步地执行。在个别情况下（例如测量布局），有单独的`useLayoutEffect Hook`供你使用，其`API`与`useEffect `相同。
+- 与`componentDidMount`或`componentDidUpdate`不同，使用`useEffect`调度的`effect`不会阻塞浏览器更新屏幕，这让你的应用看起来响应更快。大多数情况下，`effect`不需要同步地执行。在个别情况下（例如测量布局），有单独的`useLayoutEffect Hook`供你使用，其`API`与`useEffect`相同。
 
 ## useContext(传参)
 
 - 创建：`const CountContext = createContext(defaultValue)`，只有当组件所处的树中没有匹配到`Provider`时，其`defaultValue`参数才会生效。`createContext`不是`hooks`，`hooks`是在函数中才可以使用。
 - 父组件传值：`<CountContext.Provider value={count}>放子组件</CountContext.Provider>``
-- 子组件接收：`const count = useContext(CountContext)`(`import`可以循环嵌套，在父组件中导出`context`，在子组件中` useContext`即可)
+- 子组件接收：`const count = useContext(CountContext)`(`import`可以循环嵌套，在父组件中导出`context`，在子组件中`useContext`即可)
 - 不需要逐级传递，可实现多级传递。
 
 ## useReducer
 
-- 使用：`useReducer`传入一个`reducer`函数以及`state`的初始值
-- `useReducer + useContext`实现`redux`。
+- 使用：`useReducer`传入一个`reducer`函数以及`state`的初始值，返回数组，第一个元素是变量，第二个元素是`dispatch`，`dispatch`传递一个参数，作为`reducer`中的第二个参数。
+- `useReducer + useContext`实现`redux`。`useReducer`用来改变变量，`useContext`用来传递变量。
+- 源码实现：
+  
+    ```javascript
+    function useReducer(reducer, initialState) {
+        const [state, setState] = useState(initialState);
+
+        function dispatch(action) {
+            const nextState = reducer(state, action);
+            setState(nextState);
+        }
+
+        return [state, dispatch];
+    }
+    ```
+
 
 <details>
 
