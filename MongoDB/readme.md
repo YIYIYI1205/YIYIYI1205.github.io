@@ -2,12 +2,16 @@
 
 ## NoSQL
 
-- EDBMS: 关系型数据库，都是表，使用SQL(结构性查询语言)
-- NoSQL: 非关系型数据库，轻量、开源、不提供`SQL`功能的关系数据库。
+- `EDBMS`: 关系型数据库，都是表，使用SQL(结构性查询语言)(都是表)
+- `NoSQL`: 非关系型数据库，轻量、开源、不提供`SQL`功能的关系数据库。
 
 ## MongoDB
 
 - 使用`BSON`对象来存储
+- 三个概念
+  - 数据库：存放集合
+  - 集合：类似数组，存放文档
+  - 文档：存储和操作的内容都是文档
 
 | SQL术语概念                      | MongoDB术语概念                   |
 | -------------------------------- | --------------------------------- |
@@ -149,3 +153,47 @@
 ## 用户与权限管理
 
 ### 常用权限
+
+| 权限                 | 说明                                                                               |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| read                 | 允许用户读取指定数据库                                                             |
+| readWrite            | 允许用户读写指定数据库                                                             |
+| dbAdmin              | 允许用户在指定数据库中执行管理函数，如索引创建、删除、查看统计或访问system.profile |
+| useAdmin             | 允许用户向system.users集合写入，可以在指定数据库里创建、删除和管理用户             |
+| clusterAdmin         | 允许admin数据库中定义，赋予用户所有分片和复制集相关函数的管理权限                  |
+| readAnyDatabase      | 允许admin数据库中定义，赋予用户所有数据库的读权限                                  |
+| readWriteAnyDatabase | 允许admin数据库中定义，赋予用户所有数据库的读写权限                                |
+| dbAdminAnyDatabase   | 允许admin数据库中定义，赋予用户所有数据库的dbAdmin权限                             |
+| userAdminAnyDatabase | 允许admin数据库中定义，赋予用户所有数据库的userAdmin权限                           |
+| root                 | 允许admin数据库中定义，超级账号，超级权限                                          |
+
+### 创建管理用户
+
+- `user`:用户名
+- `pwd`:密码
+- `customData`:存放用户相关的自定义数据，该属性也可忽略
+- `roles`:数组类型，配置用户的权限
+
+```
+# 查看数据库
+show dbs
+# 切换数据库
+use admin
+# 查看用户
+show users
+# 创建用户(字段不能改)
+db.createUser(
+      {
+        user:"root",
+        pwd:"1234567",
+        roles:[{role: "userAdminAnyDatabase",db: "admin"}]
+      }
+  )
+# 重新启动服务并开启验证
+# 结束服务
+db.shutdownServer()
+```
+
+
+删除用户：db.dropUser(<user_name>)
+删除所有用户：db.dropAllUser() 可能删了
