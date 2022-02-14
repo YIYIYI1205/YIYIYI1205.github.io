@@ -1,5 +1,9 @@
 # MongoDB
 
+  [官网](https://docs.mongodb.com/manual/)
+
+- 文档数据库
+
 ## NoSQL
 
 - `EDBMS`: 关系型数据库，都是表，使用SQL(结构性查询语言)(都是表)
@@ -7,7 +11,7 @@
 
 ## MongoDB
 
-- 使用`BSON`对象来存储
+- 使用`BSON`对象来存储复杂的数据类型。
 - 三个概念
   - 数据库：存放集合
   - 集合：类似数组，存放文档
@@ -23,8 +27,6 @@
 | table joins（表连接）            | 嵌入的文档和链接                  |
 | 指定任意唯一的列或列组合作为主键 | 主键被自动设置为_id字段           |
 | group by（聚合）                 | 聚合操作                          |
-
-
 
 | 数据类型           | 描述                                     |
 | ------------------ | ---------------------------------------- |
@@ -45,6 +47,7 @@
 | Regular expression | 正则表达式                               |
 
 - 安装
+
 ```
     # 进入 /usr/local
     cd /usr/local
@@ -57,7 +60,6 @@
     sudo tar -zxvf mongodb-macos-x86_64-5.0.5.tgz
 
     # 重命名为 mongodb 目录
-
     sudo mv mongodb-macos-x86_64-5.0.5/ mongodb
 
     cd /usr/local/mongodb
@@ -65,6 +67,7 @@
 
 - 启动MongoDB
   - 前台启动：MongoDB启动进程后会占用当前的终端窗口
+
     ```
         # --dbpath 设置数据存放目录
         # --logpath 设置日志存放目录
@@ -79,6 +82,9 @@
 
         sudo bin/mongod --dbpath /usr/local/mongodb/data/db/ --logpath /usr/local/mongodb/logs/mongodb.log --logappend --port 27017 --bind_ip 0.0.0.0
 
+
+        测试：ps aux|grep mongo
+
         ctrl + c结束进程
 
         # 在开启进程的前提下，新建终端
@@ -90,6 +96,7 @@
 
         ps -ef | grep mongodb
     ```
+
   - 后台启动：
 
     ```
@@ -103,6 +110,7 @@
         # 或者
         kill -9 进程号
     ```
+
     - 配置文件(没成功)
       - `bin`目录下加一个`mongodb.conf`配置文件
 
@@ -138,6 +146,7 @@
   - 检查：ps -ef | grep mongodb
 
 - 配置环境变量
+
   ```
     vim /etc/profile
     加一行
@@ -147,8 +156,6 @@
     :wq退出
     source /etc/profile
   ```
-
-
 
 ## 用户与权限管理
 
@@ -193,7 +200,6 @@ db.createUser(
 # 结束服务
 db.shutdownServer()
 ```
-
 
 删除用户：db.dropUser(<user_name>)
 删除所有用户：db.dropAllUser() 可能删了
