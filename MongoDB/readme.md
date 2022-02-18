@@ -242,7 +242,109 @@
   `注意：在mongodb中每个文档都会有一个_id作为唯一标识，_id默认会自动生成，如果手动指定将使用手动指定的值作为_id的值`
 
   - 查询文档：`db.集合名称.find()`
-  - 删除文档：`db.集合名称.remove()`
+  - 删除文档：
+  ```json
+    db.集合名称.remove(
+      <query>, 
+      { 
+        justOne: <boolean>, 
+        writeConcern: <document> 
+      }
+    )
+
+    // 删除所有要传空对象
+    db.集合名称.remove({})
+
+    // 条件删除
+    db.集合名称.remove({_id: 1})
+
+    // 自动生成的主键会是_id: ObjectId('4e7020cb7cac81af7136236b')的形式
+    db.集合名称.remove({_id: ObjectId('4e7020cb7cac81af7136236b')})
+  ```
+    - `query`:（可选）删除的文档的条件。
+    - `justOne`: （可选）如果设为`true`或`1`，则只删除一个文档，如果不设置该参数，或使用默认值`false`，则删除所有匹配条件的文档。
+    - `writeConcern`:（可选）抛出异常的级别。
+  - 更新文档：默认更新会先将文档删除，再将文档插入(但是`_id`是会保存的)，若要保留原始文档，需要在`update`写`$set`
+    ```json
+      db.集合名称.update(
+        <query>,
+        <update>,
+        { 
+          upsert: <boolean>, 
+          multi: <boolean>, 
+          writeConcern: <document> 
+        }
+      )
+
+      // 保留原始文档
+      db.集合名称.update({_id: 11}, {$set: {_id: 12}})
+    ```
+    - `query`: `update`的查询条件，类似`sql update`查询内`where`后面的。
+    - `update`: `update`的对象和一些更新的操作符（如`$,$inc...`）等，也可以理解为`sql update`查询内`set`后面的
+    - `upsert`: 可选，如果不存在`update`的记录，是否插入`objNew`，`true`为插入，默认是`false`，不插入。
+    - `multi`: 可选，`mongodb`默认是`false`，只更新找到的第一条记录，如果这个参数为`true`，就把按条件查出来多条记录全部更新。
+    - `writeConcern`:可选，抛出异常的级别。
+  - 文档查询：以非机构化的方式来显示所有文档，`db.集合名称.find(query, projection)`；若要以格式化的方式显示所有文档，`db.集合名称.find().pretty()`
+    - `query`：可选，使用查询操作符指定查询条件
+    - `projection`：可选，使用投影操作符指定返回的键。查询时返回文档中所有键值，只需省略该参数即可（默认省略）。
+  
+    查询分类：
+    <details>
+      <summary>和sql对比</summary>
+
+      | 操作        | 格式                                                                            | 范例                                                                                           | RDBMS中的类似语句                                              |
+      | ----------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+      | 等于        | {\<key\>:\<value\>}                                                             | db.col.find({"by":"菜鸟教程"}).pretty()                                                        | WHERE by = '菜鸟教程'                                          |
+      | 小于        | {\<key\>:{`$lt`:\<value\>}}                                                     | db.col.find({"likes":{$lt:50}}).pretty()                                                       | WHERE likes < 50                                               |
+      | 小于或等于  | {\<key\>:{`$lte`:\<value\>}}                                                    | db.col.find({"likes":{$lte:50}}).pretty()                                                      | WHERE likes <= 50                                              |
+      | 大于        | {\<key\>:{`$gt`:\<value\>}}                                                     | db.col.find({"likes":{$gt:50}}).pretty()                                                       | WHERE likes > 50                                               |
+      | 大于或等于  | {\<key\>:{`$gte`:\<value\>}}                                                    | db.col.find({"likes":{$gte:50}}).pretty()                                                      | WHERE likes >= 50                                              |
+      | 不等于      | {\<key\>:{`$ne`:\<value\>}}                                                     | db.col.find({"likes":{$ne:50}}).pretty()                                                       | WHERE likes != 50                                              |
+      | AND         | {\<key1\>:\<value1\>, \<key2\>:\<value2\>, ...}                                 | db.col.find({"by":"菜鸟教程", "title":"MongoDB 教程"}).pretty()                                | WHERE by='菜鸟教程' AND title='MongoDB 教程'                   |
+      | OR          | {`$or`: [{\<key1\>:\<value1\>}, {\<key2\>:\<value2\>}]}                         | db.col.find({$or:[{"by":"菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()                      | WHERE by='菜鸟教程' OR title='MongoDB 教程                     |
+      | AND和OR联用 | {\<key\>:\<value\>, `$or`: [{\<key1\>:\<value1\>}, {\<key2\>:\<value2\>}, ...]} | db.col.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty() | WHERE likes>50 AND (by = '菜鸟教程' OR title = 'MongoDB 教程') |
+    </details>
+    - 如果一个字段的查询条件出现多次，默认查询后面的条件
+    - 对于同一个字段的或查询，使用`$in`：`db.集合名称.find({age: {$in: [10, 20]}})`
+    - 对于同一个字段的且查询，使用`$all`：`db.集合名称.find({age: {$all: [10, 20]}})`
+    - 支持数组类型中的某个元素查询：`db.集合名称.find({likes: '看电视'})`会查找出`likes`中包含看电视的所有元素
+    - 按照数组的长度查询`$size`：`db.集合名称.find({likes: {$size: 3}})`
+    - 模糊查询：使用正则表达式，`db.集合名称.find({name: /良/, likes: /女/})`
+    - 排序：`db.集合名称.find().sort({name: 1, age: 1})`，`1`升序，`-1`降序
+    - 分页：`db.集合名称.find().sort({条件}).skip(start).limit(rows)`，`skip()`方法来跳过指定数量的数据，`limit()`方法指定读取的记录条数
+    - 总条数：`db.集合名称.count()`；某个条件的总条数：`db.集合名称.find({name: 'xxx'}).count()`
+    - 去重：`db.集合名称.distinct('字段')`，返回的是剩下的这个字段的数组
+    - 指定返回字段：`db.集合名称.find({条件}, {name: 1， age: 1})`，`1`表示返回，`0`表示不返回，`1`和`0`不能同时使用
+    - 按照数据类型查询`$type`：`db.col.find({"title" : {$type : 2}})`或`db.col.find({"title" : {$type : 'string'}})`
+      <details>
+        <summary>类型表</summary>
+
+        | 类型                             | 数字                  |
+        | -------------------------------- | --------------------- |
+        | Double(默认整数和小数都是Double) | 1                     |
+        | String                           | 2                     |
+        | Object                           | 3                     |
+        | Array                            | 4                     |
+        | Binary data                      | 5                     |
+        | Undefined                        | 6(已废弃。)           |
+        | Object id                        | 7                     |
+        | Boolean                          | 8                     |
+        | Date                             | 9                     |
+        | Null                             | 10                    |
+        | Regular Expression               | 11                    |
+        | JavaScript                       | 13                    |
+        | Symbol                           | 14                    |
+        | JavaScript (with scope)          | 15                    |
+        | 32-bit integer                   | 16                    |
+        | Timestamp                        | 17                    |
+        | 64-bit integer                   | 18                    |
+        | Min key                          | 255 （Query with -1） |
+        | Max key                          | 127                   |
+      </details>
+    - 索引(提高效率)：在集合层面上定义了索引，并支持对集合中的任何字段或文档的子字段进行索引；`_id`会被自动创建索引
+      - 操作
+        - 创建索引：`db.集合名称.createIndex(keys, options)`
+
 
 ## 用户与权限管理
 
