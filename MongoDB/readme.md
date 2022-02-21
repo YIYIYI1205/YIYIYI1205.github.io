@@ -304,6 +304,7 @@
       | OR          | {`$or`: [{\<key1\>:\<value1\>}, {\<key2\>:\<value2\>}]}                         | db.col.find({$or:[{"by":"菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()                      | WHERE by='菜鸟教程' OR title='MongoDB 教程                     |
       | AND和OR联用 | {\<key\>:\<value\>, `$or`: [{\<key1\>:\<value1\>}, {\<key2\>:\<value2\>}, ...]} | db.col.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty() | WHERE likes>50 AND (by = '菜鸟教程' OR title = 'MongoDB 教程') |
     </details>
+
     - 如果一个字段的查询条件出现多次，默认查询后面的条件
     - 对于同一个字段的或查询，使用`$in`：`db.集合名称.find({age: {$in: [10, 20]}})`
     - 对于同一个字段的且查询，使用`$all`：`db.集合名称.find({age: {$all: [10, 20]}})`
@@ -343,9 +344,47 @@
       </details>
     - 索引(提高效率)：在集合层面上定义了索引，并支持对集合中的任何字段或文档的子字段进行索引；`_id`会被自动创建索引
       - 操作
-        - 创建索引：`db.集合名称.createIndex(keys, options)`
+        - 创建索引：`db.集合名称.createIndex(keys, options)`，`key`为要创建的索引字段，`1`为指定按升序创建索引
+          ```json
+            db.集合名称.createIndex({title: 1, description: -1})
+          ```
+          <details>
+            <summary>参数</summary>
 
+            | Parameter            | Type          | Description                                                                                                                                |
+            | -------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+            | `background`         | Boolean       | 建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 "background" 可选参数。 "background" 默认值为false。            |
+            | `unique`             | Boolean       | 建立的索引是否唯一。指定为true创建唯一索引。默认值为false。                                                                                |
+            | `name`               | string        | 索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。                                                          |
+            | sparse               | Boolean       | 对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档。默认值为 false。 |
+            | `expireAfterSeconds` | integer       | 指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。但是不会自动删除。                                                             |
+            | `v`                  | index version | 索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。                                                                             |
+            | weights              | document      | 索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。                                                              |
+            | default_language     | string        | 对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语。                                                                    |
+            | language_override    | string        | 对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language重。                                              |
+          </details>
+        - 查看索引：`db.集合名称.getIndexes()`
+        - 查看集合索引大小：`db.集合名称.totalIndexSize()`
+        - 删除集合所有索引：`db.集合名称.dropIndexes()`
+        - 删除集合指定索引：`db.集合名称.dropIndex('索引名称')`
+        - 创建复合索引：由多个字段共同维护的索引，遵循左前缀原则，`db.集合名称.createIndex({key1: 1, key2: 1}, {name: 'xxx'})`
+    - 聚合(`aggregate`)
+      - 用于处理数据(诸如统计平均值，求和等)，并返回计算后的数据结果
+      - `db.集合名称.aggregate([{$group: {_id: $字段名称, 分组后的名称: {$sum: 1}}}])`，`1`会就表示求和，`2`表示给求和的结果乘以`2`
+      <details>
+        <summary>聚合的表达式</summary>
 
+        | 表达式    | 描述                                                                               | 实例                                                                                  |
+        | --------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+        | $sum      | 计算总和。                                                                         | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : "$likes"}}}]) |
+        | $avg      | 计算平均值                                                                         | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$avg : "$likes"}}}]) |
+        | $min      | 获取集合中所有文档对应值得最小值。                                                 | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$min : "$likes"}}}]) |
+        | $max      | 获取集合中所有文档对应值得最大值。                                                 | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$max : "$likes"}}}]) |
+        | $push     | 将值加入一个数组中，不会判断是否有重复的值。                                       | db.mycol.aggregate([{$group : {_id : "$by_user", url : {$push: "$url"}}}])            |
+        | $addToSet | 将值加入一个数组中，会判断是否有重复的值，若相同的值在数组中已经存在了，则不加入。 | db.mycol.aggregate([{$group : {_id : "$by_user", url : {$addToSet : "$url"}}}])       |
+        | $first    | 根据资源文档的排序获取第一个文档数据。                                             | db.mycol.aggregate([{$group : {_id : "$by_user", first_url : {$first : "$url"}}}])    |
+        | $last     | 根据资源文档的排序获取最后一个文档数据                                             | db.mycol.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}])      |
+      </details>
 ## 用户与权限管理
 
 ### 常用权限
