@@ -61,6 +61,7 @@
     <pre><blockcode>
       # 启动mongo服务
       sudo bin/mongod --dbpath /usr/local/mongodb/data/db/ --logpath /usr/local/mongodb/logs/mongodb.log --logappend --port 27017 --bind_ip 0.0.0.0
+      所有都可以访问：--bind_ip 0.0.0.0
     </blockcode></pre>
     <pre><blockcode>
       # 测试：ps aux|grep mongo
