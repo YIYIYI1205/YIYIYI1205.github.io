@@ -129,7 +129,7 @@
       | enum    | 枚举                                                               |
     </details>
 - 联合类型：`|` 表示或
-- 声明变量如果不指定类型，则`ts`解析器会自动判断变量的类型为`any`（隐式的`any`），将`any`类型的值赋值给别的类型的值，会使别的类型的值也失去类型检测；可以使用`unknown`，或者使用类型断言`as` 
+- 声明变量如果不指定类型，则`ts`解析器会自动判断变量的类型为`any`（隐式的`any`），将`any`类型的值赋值给别的类型的值，会使别的类型的值也失去类型检测；可以使用`unknown`，或者使用类型断言`as`
 - 类型断言：`变量 as 类型`或者`<类型>变量`
 - 任意类型属性：`{[propName: string]: any}`
 - 函数结构的类型声明：`(形参:类型, 形参:类型...) => 返回值类型`，例如：`let b: (a: number) => number`
@@ -146,16 +146,119 @@
     console.log(gender) // 0
     console.log(gender === Gender.Male)
   ```
+- `null`和`undefined`是`never`类型 的子类型
 - 类型别名：`type 类型名 = `
+
+## 函数
+
+- 可选参数：参数后加`?`，必须配置到参数的最后面
+- 默认参数：需要在参数后面赋值
+- 剩余参数：`...`三点运算符接收形参`function(...result: number[])`
+- 函数的重载：同名函数，在`es5`中会被下面的替代；上面写函数的参数和返回值，下面函数写具体实现
+  ```javascript
+    function getInfo(name: string): string;
+    function getInfo(name: string, age: number): string;
+    function getInfo(name: any, age?: number): any {
+        // 具体实现
+    }
+  ```
+- 箭头函数`this`指向上下文
 
 ## 面向对象
 
 ### 类
 
+#### `es5`中的类
+
+- 构造函数
+  ```javascript
+      // 1. 构造函数中增加属性、方法
+      function Person(name){
+          this.name = name
+          this.a = function(){
+              console.log(this.name)
+          }
+      }
+      var p = new Person('xxx')
+      p.a()
+  ```
+- 原型链：原型链上的属性会被多个实例共享，构造函数不会
+  ```javascript
+    // 2. 原型链上增加属性、方法  原型链上的属性会被多个实例共享，构造函数不会
+    Person.prototype.b = function(){
+        console.log(this.name)
+    }
+    p.b()
+  ```
+- 静态方法
+  ```javascript
+    // 3. 实例方法必须通过new才能调用，静态方法可以直接用类调用
+    Person.getInfo = function(){
+      // 静态方法
+    }
+    // 例如jquery中的$('#box').css是实例方法，$.ajax是静态方法
+  ```
+- 继承
+  1. 对象冒充实现继承`call`：不可以继承原型链上的属性和方法
+     ```javascript
+        // 4. 继承：对象冒充实现继承——不可以继承原型链上的属性和方法
+        function Web(){
+            Person.call(this) // 对象冒充可以继承构造函数的属性和方法
+        }
+        var w = new Web()
+        w.run()
+        w.a() // 报错，对象冒充不可以继承原型链上的属性和方法
+     ```
+  2. 原型链继承：实例化子类的时候无法给父类传参
+     ```javascript
+        // 5. 继承：对象原型链实现继承——实例化子类的时候无法给父类传参
+        function Web(name){}
+        Web.prototype = new Person() // 原型链实现继承，既可以继承构造函数的属性和方法，也可以继承原型链上的属性和方法
+        var w = new Web('xx')
+        w.run() // this.name is undefined // 实例化子类的时候无法给父类传参
+     ```
+  3. 对象冒充+原型链继承的组合继承
+     ```javascript
+        function Web(name) {
+            Person.call(this, name) // 对象冒充继承，实例化子类可以给父类传参
+        }
+        Web.prototype = new Person()
+     ```
+  4. 组合继承的另一种方式
+     ```javascript
+        function Web(name) {
+            Person.call(this, name) // 对象冒充继承，实例化子类可以给父类传参
+        }
+        Web.prototype = Person.Prototype
+     ```
+
+#### 属性的封装
+
+- 属性值可以任意修改，数据变得非常不安全
+- `public`：修饰的属性可以在任意位置访问（修改），默认值
+- `private`：私有属性，只能在当前类内部进行访问（修改）
+- `protected`：受保护的属性，只能在当前类和当前类的子类中访问（修改），不能在实例中访问（外部）
+- 可重写`getter`、`setter`方法
+  ```javascript
+    get name() {
+        return this._name
+    }
+    console.log(per.name) // 虽然没有name属性，但是调用name方法，
+    // 简写
+    constructor(public name: string, age: number){}
+    // 等价于
+    name: string
+    age: number
+    constructor(name: string; age:number){
+        this.name = name
+        this.age = age
+    }
+  ```
+
 #### 属性和方法
 
 - 实例属性/方法：直接定义在类中，需要通过对象的实例才能访问（`new`一个实例）
-- 类属性（静态属性）/方法：无需创建对象，直接用类能访问到，在属性前`static`
+- 类属性（静态属性）/方法：无需创建对象，直接用类能访问到，在属性前`static`，静态方法只能调用静态属性、类
 - 只读属性：`readonly`
 
 #### 构造函数
@@ -170,11 +273,12 @@
 - `OCP`原则(开闭原则)
 - 方法的重写：子类方法可以覆盖父类方法
 - `super`：表示当期类的父类，`constructor`需要调用`super`调用父类的构造函数，并且传递参数，不写`constructor`时自动调用
+- 多态：父类定义一个方法不去实现，让继承它的子类去实现，每一个子类有不同的表现
 
 #### 抽象类
 
-- `abstract`：禁止一个类创建对象，专门用来被继承的类，抽象类中可以定义抽象方法，抽象方法可以不写方法体，子类必须对抽象方法进行重写
-
+- 抽象类中的抽象方法不包含具体实现并且必须在派生类中实现
+- 禁止一个类创建对象，专门用来被继承的类，抽象类中可以定义抽象方法，抽象方法可以不写方法体，子类必须对抽象方法进行重写
 
 ### 接口
 
@@ -182,29 +286,35 @@
 - `interface`可以重复声明，并且以两个共同的为主；`type`不能重复声明；`interface`定义一个类的结构时，有点像抽象类，接口中所有属性都不能有实际的值
 - `implements`：一个类实现一个接口
 
-#### 属性的封装
-
-- 属性值可以任意修改，数据变得非常不安全
-- `public`：修饰的属性可以在任意位置访问（修改），默认值
-- `private`：私有属性，只能在类内部进行访问（修改）
-- `protected`：受保护的属性，只能在当前类和当前类的子类中访问（修改），不能在实例中访问
-- 可重写`getter`、`setter`方法
-  ```javascript
-    get name() {
-        return this._name
-    }
-    console.log(per.name) // 虽然没有name属性，但是调用name方法，
-  ```
-  ```javascript
-    // 简写
-    constructor(public name: string, age: number){}
-    // 等价于
-    name: string
-    age: number
-    constructor(name: string; age:number){
-        this.name = name
-        this.age = age
-    }
-  ```
-
 ### 泛型
+
+- 在定义函数或是类时，如果遇到类型不明确就可以使用泛型
+  ```javascript
+    function fn<T>(a: T): T{
+        return a
+    }
+    let result = fn(10) // 不指定泛型，TS可以自动对类型进行推断
+    let result2 = fn<string>('hello')
+    // 泛型可以同时指定多个
+    function fn2<T, K>(a: T, b: K): T{
+        console.log(b)
+        return a
+    }
+    fn2<number, string>(123, 'hello')
+    interface Inter{
+        length: number
+    }
+    // 泛型T必须是Inter的实现类(子类)
+    function fn3<T extends Inter>(a: T): number{
+        return a.length
+    }
+    fn3(a: '123')
+    class MyClass<T>{
+        name: T
+        constructor(name: T){
+            this.name = name
+        }
+    }
+    const mc = new MyClass<string>(name: 'xxx')
+  ```
+
