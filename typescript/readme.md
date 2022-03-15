@@ -277,14 +277,69 @@
 
 #### 抽象类
 
+- 提供其他类继承的基类，不能直接被实例化
 - 抽象类中的抽象方法不包含具体实现并且必须在派生类中实现
-- 禁止一个类创建对象，专门用来被继承的类，抽象类中可以定义抽象方法，抽象方法可以不写方法体，子类必须对抽象方法进行重写
-
+- 抽象方法只能放在抽象类中
+- 子类必须对抽象方法进行重写
+  ```javascript
+    abstract class Animal{
+        constructor(public name: string)
+        abstract eat(): any
+    }
+    class Dog extends Animal{
+        constructor(name:string) {
+            super(name)
+        }
+        eat(){
+            console.log('xx')
+        }
+    }
+  ```
 ### 接口
 
+- 可以对类、方法、属性(对象)进行约束，抽象类只能对类进行约束
 - `interface`：用来定义一个类（对象）的结构，定义一个类中应该包含哪些属性和方法，接口也可以当成类型声明(`type`)去使用
 - `interface`可以重复声明，并且以两个共同的为主；`type`不能重复声明；`interface`定义一个类的结构时，有点像抽象类，接口中所有属性都不能有实际的值
 - `implements`：一个类实现一个接口
+  ```javascript
+    interface FullName {
+        firstName: string;
+        secondName: string;
+    }
+    function getName(name: FullName){}
+    getName({
+        firstName: '1'
+        secondeName: '2'
+        age: 1
+    }) // 报错
+    const obj = {
+        firstName: '1'
+        secondeName: '2'
+        age: 1
+    }
+    getName(obj) // 不报错
+    // 对函数进行约束
+    interface encrypt{
+        (key: string, value: string): string;
+    }
+    const md5:encrypt = function(key:string, value: string): string{}
+
+    // 类类型接口：对类的约束，和抽象类有点相似
+    interface Animal{
+      name: string;
+      eat(str: string): void;
+    }
+    class Dog implements Animal{}
+  ```
+- 接口的继承
+  ```javascript
+    interface Animal{
+      eat(): void
+    }
+    interface Person extends Animal{}
+    class Programmer{}
+    class Web extends Programmer implements Person{}
+  ```
 
 ### 泛型
 
