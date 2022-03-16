@@ -1,5 +1,8 @@
 # typeorm
 
+[文档](https://typeorm.io/#/decorator-reference/column)
+https://typeorm.biunav.com/zh/decorator-reference.html#%E5%88%97%E8%A3%85%E9%A5%B0%E5%99%A8
+
 ## 使用
 
 - 连接`createConnection`

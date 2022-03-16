@@ -146,7 +146,7 @@
     console.log(gender) // 0
     console.log(gender === Gender.Male)
   ```
-- `null`和`undefined`是`never`类型 的子类型
+- `null`和`undefined`是`never`类型的子类型
 - 类型别名：`type 类型名 = `
 
 ## 函数
@@ -175,20 +175,31 @@
       // 1. 构造函数中增加属性、方法
       function Person(name){
           this.name = name
-          this.a = function(){
+          this.run = function(){
               console.log(this.name)
           }
       }
       var p = new Person('xxx')
-      p.a()
+      p.run()
   ```
 - 原型链：原型链上的属性会被多个实例共享，构造函数不会
   ```javascript
-    // 2. 原型链上增加属性、方法  原型链上的属性会被多个实例共享，构造函数不会
-    Person.prototype.b = function(){
+    // 2. 原型链上增加属性、方法  
+    Person.prototype.work = function(){
         console.log(this.name)
     }
-    p.b()
+    p.work()
+    // 解释：原型链上的属性会被多个实例共享，构造函数不会
+    function superType() {
+      this.colors = ['red', 'blue', 'green' ]
+    }
+    function SubType () {}
+    SubType.prototype = new superType()
+    var instance1 = new SubType()
+    instance1.colors.push('black')
+    console.log(instance1.colors) // ['red', 'blue', 'green', 'black' ]
+    var instance2 = new SubType()
+    console.log(instance2.colors) // ['red', 'blue', 'green', 'black' ]
   ```
 - 静态方法
   ```javascript
@@ -207,9 +218,9 @@
         }
         var w = new Web()
         w.run()
-        w.a() // 报错，对象冒充不可以继承原型链上的属性和方法
+        w.work() // 报错，对象冒充不可以继承原型链上的属性和方法
      ```
-  2. 原型链继承：实例化子类的时候无法给父类传参
+  2. 原型链继承：实例化子类的时候无法给父类传参，并且一个实例改变属性，其它实例也会改变
      ```javascript
         // 5. 继承：对象原型链实现继承——实例化子类的时候无法给父类传参
         function Web(name){}
@@ -300,7 +311,7 @@
 - 可以对类、方法、属性(对象)进行约束，抽象类只能对类进行约束
 - `interface`：用来定义一个类（对象）的结构，定义一个类中应该包含哪些属性和方法，接口也可以当成类型声明(`type`)去使用
 - `interface`可以重复声明，并且以两个共同的为主；`type`不能重复声明；`interface`定义一个类的结构时，有点像抽象类，接口中所有属性都不能有实际的值
-- `implements`：一个类实现一个接口
+- `implements`：一个类实现一个接口：当一个类实现了一个接口时，只对其实例部分进行类型检查。 `constructor`存在于类的静态部分，所以不在检查的范围内。
   ```javascript
     interface FullName {
         firstName: string;
@@ -338,7 +349,19 @@
     }
     interface Person extends Animal{}
     class Programmer{}
+    // 类继承类继承接口
     class Web extends Programmer implements Person{}
+    // 接口继承多个接口
+    interface Square extends Shape, PenStroke {
+      sideLength: number;
+    }
+    // 接口继承类
+    class Control {
+    private state: any;
+    }
+    interface SelectableControl extends Control {
+      select(): void;
+    }
   ```
 
 ### 泛型
@@ -363,13 +386,86 @@
     function fn3<T extends Inter>(a: T): number{
         return a.length
     }
-    fn3(a: '123')
+    fn3('123') // 3
     class MyClass<T>{
         name: T
         constructor(name: T){
             this.name = name
         }
     }
-    const mc = new MyClass<string>(name: 'xxx')
+    const mc = new MyClass<string>('xxx')
+
+    // 泛型接口
+    interface ConfigFn{
+      // 第一种写法
+      <T>(value:T): T
+    }
+    const getData: ConfigFn = function<T>(value: T): T{
+      return value
+    }
+    // 第二种写法
+    interface ConfigFn<T>{
+      (value:T): T
+    }
+    const myGetData: ConfigFn<string> = function<T>(value: T): T{
+      return value
+    }
+    getData<string>('张三')
+  ```
+  ```javascript
+    // 将类作为参数
+    class User{
+      username: string | undefined;
+      password: string | undefined;
+    }
+    class MysqlDb{
+      add(user: User): boolean{
+        return true
+      }
+    }
+    var u = new User()
+    u.username = '张三'
+    u.password = '12345'
+    var db = new MysqlDb()
+    db.add(u)
+
+    // 操作数据库的泛型类
+    class MysqlDb<T> {
+      add(info: T): boolean{
+        return true
+      }
+    }
+    var userDb = new MySqlDb<User>()
   ```
 
+```javascript
+  interface DBI{
+    add(info: T): boolean
+    update(info: T, id: number): boolean
+    delete(id: number): boolean
+    get(id: number):any[]
+  }
+  // 定义一个操作mysql数据库的类 注意：要实现泛型接口，这个类也应该是一个泛型类
+  class MysqlDb<T> implements DBI<T>{
+    add(info: T): boolean{
+    }
+    update(info: T, id: number): boolean {
+    }
+    delete(id: number): boolean {
+    }
+    get(id: number):any[] {
+    }
+  }
+  // 操作用户表 定义一个User类和数据表做映射
+  class User{
+    username: string | undefined
+    password: string | undefined
+  }
+  const u = new User()
+  u.username = '张三'
+  u.password = '123456'
+  const oMysql = new MysqlDb<User>()
+  iMysql.add(u)
+```
+
+### 模块
