@@ -246,9 +246,10 @@
 #### 属性的封装
 
 - 属性值可以任意修改，数据变得非常不安全
-- `public`：修饰的属性可以在任意位置访问（修改），默认值
-- `private`：私有属性，只能在当前类内部进行访问（修改）
-- `protected`：受保护的属性，只能在当前类和当前类的子类中访问（修改），不能在实例中访问（外部）
+- 类的实例属性
+  - `public`：修饰的属性可以在任意位置访问（修改），默认值
+  - `private`：私有属性，只能在当前类内部进行访问（修改）
+  - `protected`：受保护的属性，只能在当前类和当前类的子类中访问（修改），不能在实例中访问（外部）
 - 可重写`getter`、`setter`方法
   ```javascript
     get name() {
@@ -268,7 +269,7 @@
 
 #### 属性和方法
 
-- 实例属性/方法：直接定义在类中，需要通过对象的实例才能访问（`new`一个实例）
+- 实例属性/方法：直接定义在类中，需要通过对象的实例才能访问（`new`一个实例）（`public\private\protected`）
 - 类属性（静态属性）/方法：无需创建对象，直接用类能访问到，在属性前`static`，静态方法只能调用静态属性、类
 - 只读属性：`readonly`
 
@@ -469,3 +470,147 @@
 ```
 
 ### 模块
+
+- `ts`外部模块的简称，侧重代码的服用，一个模块里可能会有多个命名空间
+
+### 命名空间
+
+- 内部模块，主要用于组织代码，避免命名冲突
+  ```javascript
+    namespace A{}
+  ```
+
+### 装饰器
+
+- 装饰器是一种特殊类型的声明，它能够被附加到类声明、方法、属性或参数上，可以修改类的行为
+- 装饰器的写法：普通装饰器（无法传参）、装饰器工厂（可传参）
+- 装饰器报错：`tsc index.ts --experimentalDecorators`或`tsc index.ts --target ES5 --experimentalDecorators`
+  1. 类装饰器
+    ```javascript
+      // 类装饰器
+      function logClass(params: any){
+        console.log(params) // params就是当前类
+        params.prototype.apiUrl = '动态扩展的属性'
+        params.prototype.run = function() {
+          console.log('这是一个run方法')
+        }
+      }
+
+      @logClass // 无需传参，默认就传了
+      class HttpClient{
+        constructor(){}
+        getData(){}
+      }
+      const http: any = new HttpClient()
+      console.log(http.apiUrl)
+      http.run()
+
+      // 装饰器工厂
+      function logClass(params: string) {
+        return function(target: any) {
+          console.log(target) // 类
+          console.log(params) // hello
+          target.prototype.apiUrl = params
+        }
+      }
+      @logClass('hello')
+      class HttpClient{
+        constructor(){}
+        getData(){}
+      }
+
+      // 类装饰器重载构造函数
+      function logClass(target: any){
+        console.log(target)
+        return class extends target{
+          apiUrl: any = '修改后的数据';
+          getData() {} // 该方法也需要重载
+        }
+      }
+      @logClass
+      class HttpClient{
+        public apiUrl: string | undefined
+        constructor() {
+          this.apiUrl = '构造函数里里面的apiUrl'
+        }
+        getData(){
+          console.log(this.apiUrl)
+        }
+      }
+      const http = new HttpClient()
+    ```
+  2. 属性装饰器
+     - `params`：属性装饰器传递的参数
+     - `target`：对于静态属性来说是类的构造函数，对于实例属性是类的原型对象
+     - `attr`：属性名
+    ```javascript
+      function logProperty(params: string) {
+        return function (target: any, attr: string) {
+          console.log('params:', params) // aaa：传递的参数
+          console.log('target:', target) // {}：类的原型对象
+          console.log('attr:', attr) // url：属性名称
+          target[attr] = params
+        }
+      }
+      class HttpClient{
+        @logProperty('aaa')
+        public url: any | undefined
+
+        getData(){
+          console.log(this.url)
+        }
+      }
+      const http = new HttpClient()
+      http.getData()
+    ```
+  3. 方法装饰器
+     - `target`：对于静态方法来说是类的构造函数，对于实例方法是类的原型对象
+     - `methodName`：方法名称
+     - `desc`：描述
+     - 在`return`中的`this`指向使用装饰器的方法的`this`
+       ```javascript
+          class Person {
+            static test() {
+              console.log('Person', this)
+            }
+          }
+          Person.test()
+          const obj = {
+            a: 1,
+            test() {
+              console.log('obj:', this)
+              Person.test()
+            }
+          }
+          obj.test()
+       ```
+    ```javascript
+      function logMethod(params: string) {
+        return function(target:any, methodName: string, desc: any){
+          console.log(params) // aaa
+          console.log(target) // 类
+          console.log(methodName) // getData
+          console.log(desc) // 方法的描述
+          // 修改方法
+          // 保存当前的方法
+          const oMethod = desc.value
+          desc.value = function(...args: any[]) {
+            // 这里this指向使用装饰器的方法的this
+            // 修改方法
+            // 执行旧方法
+            oMethod.apply(this, args)
+          }
+        }
+      }
+      class HttpClient{
+        public apiUrl: string | undefined
+        constructor() {
+          this.apiUrl = '构造函数里里面的apiUrl'
+        }
+        @logMethod('aaa')
+        getData(){
+          console.log(this.apiUrl)
+        }
+      }
+    ```
+  4. 参数装饰器
