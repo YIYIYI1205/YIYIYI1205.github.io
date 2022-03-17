@@ -486,59 +486,60 @@
 - 装饰器的写法：普通装饰器（无法传参）、装饰器工厂（可传参）
 - 装饰器报错：`tsc index.ts --experimentalDecorators`或`tsc index.ts --target ES5 --experimentalDecorators`
   1. 类装饰器
-    ```javascript
-      // 类装饰器
-      function logClass(params: any){
-        console.log(params) // params就是当前类
-        params.prototype.apiUrl = '动态扩展的属性'
-        params.prototype.run = function() {
-          console.log('这是一个run方法')
-        }
-      }
+   - `target`：类
+   ```javascript
+     // 类装饰器
+     function logClass(params: any){
+       console.log(params) // params就是当前类
+       params.prototype.apiUrl = '动态扩展的属性'
+       params.prototype.run = function() {
+         console.log('这是一个run方法')
+       }
+     }
 
-      @logClass // 无需传参，默认就传了
-      class HttpClient{
-        constructor(){}
-        getData(){}
-      }
-      const http: any = new HttpClient()
-      console.log(http.apiUrl)
-      http.run()
+     @logClass // 无需传参，默认就传了
+     class HttpClient{
+       constructor(){}
+       getData(){}
+     }
+     const http: any = new HttpClient()
+     console.log(http.apiUrl)
+     http.run()
 
-      // 装饰器工厂
-      function logClass(params: string) {
-        return function(target: any) {
-          console.log(target) // 类
-          console.log(params) // hello
-          target.prototype.apiUrl = params
-        }
-      }
-      @logClass('hello')
-      class HttpClient{
-        constructor(){}
-        getData(){}
-      }
+     // 装饰器工厂
+     function logClass(params: string) {
+       return function(target: any) {
+         console.log(target) // 类
+         console.log(params) // hello
+         target.prototype.apiUrl = params
+       }
+     }
+     @logClass('hello')
+     class HttpClient{
+       constructor(){}
+       getData(){}
+     }
 
-      // 类装饰器重载构造函数
-      function logClass(target: any){
-        console.log(target)
-        return class extends target{
-          apiUrl: any = '修改后的数据';
-          getData() {} // 该方法也需要重载
-        }
-      }
-      @logClass
-      class HttpClient{
-        public apiUrl: string | undefined
-        constructor() {
-          this.apiUrl = '构造函数里里面的apiUrl'
-        }
-        getData(){
-          console.log(this.apiUrl)
-        }
-      }
-      const http = new HttpClient()
-    ```
+     // 类装饰器重载构造函数
+     function logClass(target: any){
+       console.log(target)
+       return class extends target{
+         apiUrl: any = '修改后的数据';
+         getData() {} // 该方法也需要重载
+       }
+     }
+     @logClass
+     class HttpClient{
+       public apiUrl: string | undefined
+       constructor() {
+         this.apiUrl = '构造函数里里面的apiUrl'
+       }
+       getData(){
+         console.log(this.apiUrl)
+       }
+     }
+     const http = new HttpClient()
+   ```
   2. 属性装饰器
      - `params`：属性装饰器传递的参数
      - `target`：对于静态属性来说是类的构造函数，对于实例属性是类的原型对象
@@ -613,4 +614,92 @@
         }
       }
     ```
-  4. 参数装饰器
+  4. 方法参数装饰器
+     - `target`：对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+     - `methodName`：方法名称
+     - `paramsIndex`：参数在函数参数列表中的索引
+     ```javascript
+        function logParams(params: any){
+          return function(target: any, methodName: string, paramsIndex: any) {
+            console.log(target) // 类
+            console.log(methodName) // getData
+            console.log(paramsIndex) // 0
+          }
+        }
+        class HttpClient{
+          public url: any | undefined
+          getData(@logParams('uuid') uuid: string ){
+            console.log('getData里面的方法')
+          }
+        }
+     ```
+  5. 装饰器执行顺序
+     -  属性装饰器 > 方法参数装饰器 > 方法装饰器 > 类装饰器，如果有多个同样的装饰器，先执行后面的
+     ```javascript
+          function logClass(params) {
+            return (target) => {
+              console.log(params)
+            }
+          }
+          function logProperty(params) {
+            return (target, attr) => {
+              console.log(params)
+            }
+          }
+          function logMethod(params) {
+            return (target, methodName, desc) => {
+              console.log(params)
+            }
+          }
+          function logParams(params) {
+            return (target, methodName, paramsIndex) => {
+              console.log(params)
+            }
+          }
+
+          @logClass('类装饰器1')
+          @logClass('类装饰器2')
+          class HttpClient {
+            @logProperty('属性装饰器1')
+            @logProperty('属性装饰器2')
+            public url: string | undefined = 'aaa'
+
+            @logProperty('属性装饰器3')
+            public url1: string | undefined = 'aaa'
+
+            @logMethod('方法装饰器1')
+            @logMethod('方法装饰器2')
+            getData(
+              @logParams('参数装饰器1') uuid: string,
+              @logParams('参数装饰器2') uuid1: string
+            ) {
+              console.log(uuid)
+            }
+
+            @logMethod('方法装饰器3')
+            getData1(@logParams('参数装饰器3') uuid: string) {
+              console.log(uuid)
+            }
+          }
+
+          @logClass('类装饰器3')
+          class HttpClient1 {}
+
+          // 属性装饰器2
+          // 属性装饰器1
+          // 属性装饰器3
+          // 参数装饰器2
+          // 参数装饰器1
+          // 方法装饰器2
+          // 方法装饰器1
+          // 参数装饰器3
+          // 方法装饰器3
+          // 类装饰器2
+          // 类装饰器1
+          // 类装饰器3
+
+          // 属性装饰器 { getData: [Function (anonymous)] }
+          // 方法参数装饰器 { getData: [Function (anonymous)] }
+          // 方法装饰器 { getData: [Function (anonymous)] }
+          // 类装饰器 [Function: HttpClient]
+     ```
