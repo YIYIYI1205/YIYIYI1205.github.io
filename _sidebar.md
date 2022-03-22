@@ -4,6 +4,7 @@
       - [2.script标签](javascript/javascriptBook/script.md)
       - [3.语言基础](javascript/javascriptBook/language.md)
       - [4.5555](javascript/javascriptBook/4.md)
+    - [2.TypeScript](javascript/typescript/readme.md)
 - 数据库
     - [1.MongoDB](database/mongodb.md)
 - React
