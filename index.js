@@ -1,11 +1,13 @@
-var o = { prop: 37 }
-function independent() {
-  return this.prop
+function wideTraversal(node) {
+  let nodes = [],
+    i = 0;
+  while (node != null) {
+    nodes.push(node);
+    node = nodes[i++];
+    let childrens = node.children;
+    for (let i = 0; i < childrens.length; i++) {
+      nodes.push(childrens[i]);
+    }
+  }
+  return nodes;
 }
-o.f = independent
-console.log(o.f()) // logs 37
-o.b = {
-  g: independent,
-  prop: 42
-}
-console.log(o.b.g()) // logs 42
