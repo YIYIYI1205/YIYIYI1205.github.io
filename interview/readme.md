@@ -33,6 +33,24 @@
     3. display值为 inline-block、table-cell、table-caption、table、inline-table、flex、inline-flex、- - grid、inline-grid
     4. 定位元素：position值为 absolute、fixed
 
+#### 57. 分析比较 opacity: 0、visibility: hidden、display: none 优劣和适用场景
+
+1. display: none (不占空间，不能点击)（场景，显示出原来这里不存在的结构）
+2. visibility: hidden（占据空间，不能点击）（场景：显示不会导致页面结构发生变动，不会撑开）
+3. opacity: 0（占据空间，可以点击）（场景：可以跟transition搭配）
+
+#### 60. 已知如下代码，如何修改才能让图片宽度为 300px
+
+```html
+<img src="1.jpg" style="width:480px!important;”>
+1. max-width: 300px
+2. transform: scale(0.625,0.625)
+```
+
+#### 68. 如何解决移动端 Retina 屏 1px 像素问题
+
+#### 73. 介绍下BFC,IFC,GFC和FFC
+
 ## 框架
 
 ### React/Vue
@@ -123,7 +141,9 @@ store.dispatch(actions.increase()) // {count: 3}
 
 #### 37. 为什么 Vuex 的 mutation 和 Redux 的 reducer 中 不能做异步操作?
 
+#### 62. redux 为什么要把 reducer 设计成纯函数
 
+- redux的设计思想就是不产生副作用，数据更改的状态可回溯，
 
 ### vue
 
@@ -141,6 +161,11 @@ store.dispatch(actions.increase()) // {count: 3}
 - Object.prototype.toString.call(obj).slice(8, -1) // Object Array Function
 
 ### Array、String 基础
+
+#### 72. 为什么普通 for 循环的性能远远高于 forEach 的性能，请解释其中的原因
+
+1. for 循环没有任何额外的函数调用栈和上下文；
+2. forEach函数签名实际上是array.forEach(function(currentValue, index, arr), thisValue)，它不是普通的 for 循环的语法糖，还有诸多参数和上下文需要在执行的时候考虑进来，这里可能拖慢性能
 
 #### 2. ['1', '2', '3'].map(parseInt)
 
@@ -183,28 +208,117 @@ if(a == 1 && a == 2 && a == 3){
 - 默认的排序方法会将数组元素转换 为字符串，然后比较字符串中字符的 UTF-16 编码顺序来进行排序。
 - [102, 15, 22, 29, 3, 8]
 
+#### 55.某公司 1 到 12 月份的销售额存在一个对象里面
+
+```javascript
+const obj = { 1: 222, 2: 123, 5: 888 }
+obj.length = 12
+const arr = Array.from(obj).slice(1)
+const arr1 = arr.map((value) => (value === undefined ? null : value))
+console.log(arr1)
+```
+
+#### 59. 给定两个数组，写一个方法来计算它们的交集
+
+- 2次循环
+
+#### 65. a.b.c.d 和 a['b']['c']['d']，哪个性能更高？
+
+- a.b.c.d 比 a['b']['c']['d'] 性能高点，后者还要考虑 [ ] 中是变量的情况，再者，从两种形式的结构来看，显然编译器解析前者要比后者容易些，自然也就快一点。
+
+#### 67. 数组编程题
+
+```javascript
+function method(arr) {
+  arr = Array.from(new Set(arr.sort((a, b) => a - b)))
+  const result = []
+  const len = arr[arr.length - 1] / 10 + 1
+  let current = 0
+  for (let i = 1; i <= len; i++) {
+    console.log(i)
+    let min = (i - 1) * 10
+    let max = 10 * i
+    const temp = []
+    for (let j = current; j < arr.length; j++) {
+      if (arr[j] >= min && arr[j] < max) {
+        temp.push(arr[j])
+        if (j === arr.length - 1) {
+          result.push(temp)
+        }
+      } else {
+        if (temp.length > 0) {
+          current = j
+          result.push(temp)
+        }
+        break
+      }
+    }
+  }
+  return result
+}
+function randomMethod() {
+  const arr = []
+  arr.length = 10
+  for (let i = 0; i < arr.length; i++) {
+    arr[i] = Math.floor(Math.random() * 100)
+  }
+  return arr
+}
+console.log(method(randomMethod()))
+```
+
+#### 69. 如何把一个字符串的大小写取反（大写变小写小写变大写），例如 ’AbC' 变成 'aBc'
+
+```javascript
+function transition(string) {
+  let arr = string.split('')
+  arr = arr.map((item) =>
+    item === item.toUpperCase() ? item.toLowerCase() : item.toUpperCase()
+  )
+  return arr.join('')
+}
+```
+
+#### 71. 实现一个字符串匹配算法，从长度为 n 的字符串 S 中，查找是否存在字符串 T，T 的长度是 m，若存在返回所在位置
+
+```javascript
+const find = (S, T) => {
+  if (S.length < T.length) {
+    return -1
+  }
+  for (let i = 0; i < S.length; i++) {
+    if (S.slice(i, i + T.length) === T) {
+      return i
+    }
+  }
+  return -1
+}
+```
+
 ### 作用域、优化
 
 #### 3. 什么是防抖和节流？有什么区别？如何实现？
 
 - 考点：闭包，变量提升
   - 防抖：输入框
+
     ```javascript
     function debounce(fn, wait) {
-    let timer = null
-    return () => {
+      let timer = null
+      return () => {
         const context = this
         if (timer !== null) {
-            clearTimeout(timer)
+          clearTimeout(timer)
         }
         timer = setTimeout(() => {
-            fn(...arguments)
-            // 不用箭头函数
-            fn.apply(context, arguments)
+          fn(...arguments)
+          // 不用箭头函数
+          fn.apply(context, arguments)
         }, wait)
+      }
     }
-}
     ```
+
   - 节流：快速往下滑页面
 
 ### 渲染过程、优化
@@ -391,6 +505,7 @@ const fn = newObj(Fn)
 ### event loop
 
 - js是单线程
+- Javascript 有一个 main thread 主线程和 call-stack 调用栈(执行栈)，所有的任务都会被放到调用栈等待主线程执行。
 - JS调用栈采用的是后进先出的规则，当函数执行的时候，会被添加到栈的顶部，当执行栈执行完成后，就会从栈顶移出，直到栈内被清空。
 - 同步任务会在调用栈中按照顺序等待主线程依次执行，异步任务会在异步任务有了结果后，将注册的回调函数放入任务队列中等待主线程空闲的时候（调用栈被清空），被读取到栈内等待主线程的执行。
 - 同步任务——微任务（Process.nextTick（Node独有）、Promise、Object.observe(废弃)、MutationObserver）——宏任务（script全部代码、setTimeout、setInterval、setImmediate（浏览器暂时不支持，只有IE10支持，具体可见MDN）、I/O、UI Rendering）
@@ -488,6 +603,56 @@ console.log(5)
 // 2 5 1 3 4
 ```
 
+#### 56. 要求设计 LazyMan 类，实现以下功能
+
+```javascript
+class LazyManClass {
+  constructor(name) {
+    this.name = name
+    this.taskList = []
+    console.log(`I am ${name}`)
+    setTimeout(() => {
+      this.next()
+    }, 0) // 会先执行eat方法以及sleep方法，是同步方法
+  }
+
+  eat(type) {
+    this.taskList.push(() => {
+      console.log(type)
+      this.next()
+    })
+    return this
+  }
+
+  sleep(time) {
+    this.taskList.push(() => {
+      setTimeout(() => {
+        console.log('this')
+        this.next()
+      }, time)
+    })
+    return this
+  }
+  sleepFirst (time) {
+    this.taskList.unshift(() => {
+      setTimeout(() => {
+        console.log('this')
+        this.next()
+      }, time)
+    })
+    return this
+  }
+  next() {
+    const fn = this.taskList.shift()
+    fn && fn()
+  }
+}
+function LazyMan(name) {
+  return new LazyManClass(name)
+}
+LazyMan('tony').eat('dinner').sleep(1000)
+```
+
 #### 8. setTimeout、Promise、Async/Await 的区别
 
 - 考点：宏任务、微任务
@@ -549,7 +714,28 @@ var a = 10;
 })()
 ```
 
+#### 53. 输出以下代码的执行结果并解释为什么
+
+```javascript
+var a = {n: 1};
+var b = a;
+a.x = a = {n: 2};
+
+console.log(a) // { n: 2 }
+console.log(b) // { n: 1, x: { n: 2 } }
+```
+
+- 赋值是从右到左的没错，但是.的优先级比=要高
+
 ## ES6
+
+### ES6转ES5
+
+#### 66. ES6 代码转成 ES5 代码的实现思路是什么
+
+1. 解析：解析代码字符串，生成 AST；
+2. 转换：按一定的规则转换、修改 AST；
+3. 生成：将修改后的 AST 转换成普通代码。
 
 ### Set、Map、WeakSet 和WeakMap
 
@@ -610,6 +796,7 @@ var a = 10;
 #### 42. 实现一个sleep函数
 
 - 考点：promise
+
 ```javascript
 function sleep(time) {
   return new Promise((resolve, reject) => {
@@ -625,6 +812,34 @@ sleep(1000).then(() => {console.log(123)})
 })()
 ```
 
+#### 64. 模拟实现一个 Promise.finally
+
+- Promise.prototype.finally()，在promise结束时，无论结果是fulfilled或者是rejected，都会执行指定的回调函数。
+
+```javascript
+Promise.prototype.finallyNew = function (callback) {
+  const p = this.constructor
+  return this.then(
+    (res) => {
+      p.resolve(callback()).then(() => res)
+    },
+    (err) => {
+      p.resolve(callback()).then(() => {
+        throw err
+      })
+    }
+  )
+}
+```
+
+### 箭头函数
+
+#### 58. 箭头函数与普通函数（function）的区别是什么？构造函数（function）可以使用 new 生成实例，那么箭头函数可以吗？为什么？
+
+1. 函数体内的 this 对象，就是定义时所在的对象，而不是使用时所在的对象。
+2. 不可以使用 arguments 对象，该对象在函数体内不存在。如果要用，可以用 rest 参数代替。
+3. 不可以使用 yield 命令，因此箭头函数不能用作 Generator 函数。
+4. 不可以使用 new 命令，因为：没有自己的 this，无法调用 call，apply。没有 prototype 属性 ，而 new 命令在执行时需要将构造函数的 prototype 赋值给新的对象的 __proto__
 
 ## 算法
 
@@ -759,6 +974,111 @@ function flatten(arr) {
 console.log(flatten(arr))
 ```
 
+#### 63. 如何设计实现无缝轮播
+
+- 轮播图基本都在ul盒子里面的li元素,首先获取第一个li元素和最后一个li元素,克隆第一个li元素,和最后一个li元素,分别插入到lastli的后面和firstli的前面,然后监听滚动事件,如果滑动距离超过x或-x,让其实现跳转下一张图或者跳转上一张,(此处最好设置滑动距离),然后在滑动最后一张实现最后一张和克隆第一张的无缝转换,当到克隆的第一张的时候停下的时候,,让其切入真的第一张,则实现无线滑动,向前滑动同理
+
+```javascript
+right.addEventListener('click', (e) => {
+    div.style.transform = `translate(-${(index + 1) * 500}px)`
+    index++
+})
+```
+
+### 排序
+
+#### 54. 冒泡排序如何实现，时间复杂度是多少， 还可以如 何改进
+
+- 原理：两次循环，O(n^2)，两次循环，相邻元素两两比较，如果前面的大于后面的就交换位置
+
+- 冒泡O(n^2)
+
+```javascript
+function bubbleSort(arr) {
+  const len = arr.length
+  // 外层循环i控制比较的轮数
+  for (let i = 0; i < len; i++) {
+    // 里层循环控制每一轮比较的次数j，arr[i] 只用跟其余的len - i个元素比较
+    for (let j = 1; j < len - i; j++) {
+      // 若前一个元素"大于"后一个元素，则两者交换位置
+      if (arr[j - 1] > arr[j]) {
+        [arr[j - 1], arr[j]] = [arr[j], arr[j - 1]]
+      }
+    }
+  }
+  return arr
+}
+```
+
+- 选择排序O(n^2)
+
+  - 循环一遍，找到最小的，和下标1交换；循环下一遍，找到第二小的，和下标2交换
+
+```javascript
+function selection(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    let min = i
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[min] > arr[j]) {
+        min = j
+      }
+    }
+    const temp = arr[min]
+    arr[min] = arr[i]
+    arr[i] = temp
+  }
+  return arr
+}
+```
+
+- 插入排序O(n^2)
+  - 每一次循环排好前i+1个数组长度的顺序，然后将后面的元素插入进数组中
+
+```javascript
+function insertionSort(array) {
+  const handle = [array[0]]
+  for (let i = 1; i < array.length; i++) {
+    const current = array[i]
+    for (let j = handle.length - 1; j >= 0; j--) {
+      if (current > handle[j]) {
+        handle.push(current)
+      } else {
+        if (j === 0) {
+          handle.unshift(current)
+        }
+      }
+    }
+  }
+  return handle
+}
+```
+
+- 快速排序O(n log n)
+
+  - 从中间开始，左边的都比它小，右边的都比它大，递归
+
+```javascript
+function quickSort(arr) {
+  // 4.结束递归（当ary小于等于一项，则不用处理）
+  if (arr.length <= 1) {
+    return arr
+  }
+  // 1. 找到数组的中间项，在原有的数组中把它移除
+  const middleIndex = Math.floor(arr.length / 2)
+  const middle = arr.splice(middleIndex, 1)[0]
+  // 2. 准备左右两个数组，循环剩下数组中的每一项，比当前项小的放到左边数组中，反之放到右边数组中
+  const leftArr = [],
+    rightArr = []
+  for (let i = 0; i < arr.length; i++) {
+    const current = arr[i]
+    current < middle ? leftArr.push(current) : rightArr.push(current)
+  }
+  // 3. 递归方式让左右两边的数组持续这样处理，一直到左右两边都排好序为止。
+  //（最后让左边+中间+右边拼接成最后的结果）
+  return quickSort(leftArr).concat(middle, quickSort(rightArr))
+}
+```
+
 ## 计算机网络
 
 ### http
@@ -891,4 +1211,26 @@ console.log(flatten(arr))
 
 ### cookie session
 
-- HTTP 协议是一种无状态协议，即每次服务端接收到客户端的请求时，都是一个全新的请求，服务器并不知道客户端的历史请求记录；Session 和 Cookie 的主要目的就是为了弥补 HTTP 的无状态特性。
+- HTTP 协议是一种无状态协议，即每次服务端接收到客户端的请求时，都是一个全新的请求，服务器并不知道客户端的历史请求记录；Session 和 Cookie 的主要目的就是为了弥补 HTTP 的无状态特性
+
+## Node.js
+
+### 61.介绍下如何实现 token 加密
+
+- JWT
+  1. 需要一个secret（随机数）
+  2. 后端利用secret和加密算法(如：HMAC-SHA256)对payload(如账号密码)生成一个字符串(token)，返回前端
+  3. 前端每次request在header中带上token
+  4. 后端用同样的算法解密
+
+## 工程化
+
+### webpack
+
+#### 70. 介绍下 webpack 热更新原理，是如何做到在不刷新浏览器的前提下更新页面的
+
+1. 当修改了一个或多个文件；
+2. 文件系统接收更改并通知webpack；
+3. webpack重新编译构建一个或多个模块，并通知HMR服务器进行更新；
+4. HMR Server 使用webSocket通知HMR runtime 需要更新，HMR运行时通过HTTP请求更新jsonp；
+5. HMR运行时替换更新中的模块，如果确定这些模块无法更新，则触发整个页面刷新。
