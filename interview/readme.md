@@ -1,56 +1,4 @@
 # 面试
-
-## css
-
-### 清除浮动、BFC
-
-- 清除浮动：左右元素设置为浮动后，父元素高度塌陷
-  1. 将父级也设置成浮动，爷爷元素又高度塌陷
-  2. 给父级增加定位absolute，影响文档流，下面元素会跑上来
-  3. 给父级设置overflow:hidden,当文本过长，且包含过长英文时，会出现英文文本被隐藏的情况
-  4. 给父级设置对应的高度
-  5. 末尾增加空元素进行clear：增加一个元素设置clear: both;增加了一个div标签，增加了页面的渲染负担
-  6. 给父级添加伪元素进行clear：
-  
-    ```css
-    .box::after {
-      content: '.';
-      height: 0;
-      display: block;
-      clear: both;
-    }
-    ```
-
-#### 39. 介绍下 BFC 及其应用
-
-- BFC：块级格式化上下文
-  - 解决问题
-    1. 使用Float脱离文档流，高度塌陷，使父元素高度不能撑开
-    2. Margin边距重叠，这时margin边距的结果为最大值，而不是合
-  - 创建
-    1. 浮动元素：float值为left、right
-    2. overflow值不为 visible，为 auto、scroll、hidden
-    3. display值为 inline-block、table-cell、table-caption、table、inline-table、flex、inline-flex、- - grid、inline-grid
-    4. 定位元素：position值为 absolute、fixed
-
-#### 57. 分析比较 opacity: 0、visibility: hidden、display: none 优劣和适用场景
-
-1. display: none (不占空间，不能点击)（场景，显示出原来这里不存在的结构）
-2. visibility: hidden（占据空间，不能点击）（场景：显示不会导致页面结构发生变动，不会撑开）
-3. opacity: 0（占据空间，可以点击）（场景：可以跟transition搭配）
-
-#### 60. 已知如下代码，如何修改才能让图片宽度为 300px
-
-```html
-<img src="1.jpg" style="width:480px!important;”>
-1. max-width: 300px
-2. transform: scale(0.625,0.625)
-```
-
-#### 68. 如何解决移动端 Retina 屏 1px 像素问题
-
-#### 73. 介绍下BFC,IFC,GFC和FFC
-
 ## 框架
 
 ### React/Vue
@@ -139,6 +87,17 @@ store.dispatch(actions.increase()) // {count: 2}
 store.dispatch(actions.increase()) // {count: 3}
 ```
 
+#### 85. react-router 里的Link标签和a标签有什么区别
+
+- 从最终渲染的 DOM 来看，这两者都是链接，都是 <a> 标签，区别是：
+- Link 是 react-router 里实现路由跳转的链接，一般配合 <Route> 使用，react-router 接管了其默认的链接跳转行为，区别于传统的页面跳转，<Link> 的“跳转”行为只会触发相匹配的 <Route> 对应的页面内容更新，而不会刷新整个页面。
+- 而 <a> 标签就是普通的超链接了，用于从当前页面跳转到 href 指向的另一个页面（非锚点情况）。
+  
+- Link
+  1. 有onclick那就执行onclick
+  2. click的时候阻止a标签默认事件（这样子点击<a href="/abc">123</a>就不会跳转和刷新页面）
+  3. 再取得跳转href（即是to），用history（前端路由两种方式之一，history & hash）跳转，此时只是链接变了，并没有刷新页面
+
 #### 37. 为什么 Vuex 的 mutation 和 Redux 的 reducer 中 不能做异步操作?
 
 #### 62. redux 为什么要把 reducer 设计成纯函数
@@ -151,6 +110,23 @@ store.dispatch(actions.increase()) // {count: 3}
 
 #### 40. 在 Vue 中，子组件为何不可以修改父组件传递的 Prop
 
+#### 78. Vue 的父组件和子组件生命周期钩子执行顺序是什么
+
+- 父组件： beforeCreate -> created -> beforeMount
+- 子组件： -> beforeCreate -> created -> beforeMount -> mounted
+- 父组件： -> mounted
+- 总结：从外到内，再从内到外
+- 加载渲染过程
+  - 父beforeCreate->父created->父beforeMount->子beforeCreate->子created->子beforeMount->子mounted->父mounted
+- 子组件更新过程
+  - 父beforeUpdate->子beforeUpdate->子updated->父updated
+- 父组件更新过程
+  - 父beforeUpdate->父updated
+- 销毁过程
+  - 父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
+
+#### 94. vue 在 v-for 时给每项元素绑定事件需要用事件代理吗？为什么？
+
 ## javascript
 
 ### 数据类型
@@ -161,6 +137,8 @@ store.dispatch(actions.increase()) // {count: 3}
 - Object.prototype.toString.call(obj).slice(8, -1) // Object Array Function
 
 ### Array、String 基础
+
+- Array.prototype.reduce((previousValue, currentValue, currentIndex, array), initialValue)
 
 #### 72. 为什么普通 for 循环的性能远远高于 forEach 的性能，请解释其中的原因
 
@@ -295,6 +273,120 @@ const find = (S, T) => {
 }
 ```
 
+#### 75. 数组里面有10万个数据，取第一个元素和第10万个元素的时间相差多
+
+- 数组可以直接根据索引取的对应的元素，所以不管取哪个位置的元素的时间复杂度都是 O(1)，都是用 key 精确查找哈希表的过程，其消耗时间大致相同。
+- 得出结论：消耗时间几乎一致，差异可以忽略不计
+
+#### 76. 输出以下代码运行结果
+
+```javascript
+// example 1
+var a={}, b='123', c=123;  
+a[b]='b';
+a[c]='c';  
+console.log(a[b]); // c 的键名会被转换成字符串'123'，这里会把 b 覆盖掉。
+
+---------------------
+// example 2
+var a={}, b=Symbol('123'), c=Symbol('123');  
+a[b]='b';
+a[c]='c';  
+console.log(a[b]); // 唯一的key因此是b
+
+---------------------
+// example 3
+var a={}, b={key:'123'}, c={key:'456'};  
+a[b]='b';
+a[c]='c';  
+console.log(a[b]); // 对象作为key需要转成字符串，对象类型会调用 toString 方法转换成字符串 [object Object]。
+```
+
+#### 77.算法题「旋转数组」
+
+```javascript
+function method(arr, k) {
+  const head = arr.slice(arr.length - k)
+  const fail = arr.slice(0, arr.length - k)
+  console.log(head.concat(fail))
+}
+```
+
+#### 81. 打印出 1 - 10000 之间的所有对称数
+
+```javascript
+function method() {
+  // 2位，1-9 9个数字
+  const result = []
+  for (let i = 1; i <= 9; i++) {
+    const temp = '' + i + i
+    result.push(Number(temp))
+  }
+  for (let i = 1; i <= 9; i++) {
+    for (let j = 0; j <= 9; j++) {
+      const temp = '' + i + j + i
+      result.push(Number(temp))
+    }
+  }
+  for (let i = 1; i <= 9; i++) {
+    for (let j = 0; j <= 9; j++) {
+      const temp = '' + i + j + j + i
+      result.push(Number(temp))
+    }
+  }
+  console.log(result)
+}
+```
+
+#### 82. 周一算法题之「移动零」
+
+```javascript
+function method(arr) {
+  const len = arr.length
+  const j = 0
+  for (let i = 0; i < len - j; i++) {
+    if (arr[i] == 0) {
+      arr.push(0)
+      arr.slice(i, 1)
+      j++
+      i--
+    }
+  }
+  return arr
+}
+```
+
+#### 84. 请实现一个 add 函数，满足以下功能
+
+#### 86. 「两数之和」
+
+```javascript
+function method(arr, target) {
+  for (let i = 0; i < arr.length; i++) {
+    const index = arr.indexOf(target - arr[i], i) // i表示从哪里开始
+    if (index !== -1) {
+      return [i, index]
+    } else {
+      break
+    }
+  }
+  return []
+}
+```
+
+#### 87. 在输入框中如何判断输入的是一个正确的网址。
+
+```javascript
+const isUrl = urlStr => {
+  try {
+    const { href, origin, host, hostname, pathname } = new URL(urlStr)
+    return href && origin && host && hostname && pathname && true
+  } catch (e) {
+    return false
+  }
+}
+```
+
 ### 作用域、优化
 
 #### 3. 什么是防抖和节流？有什么区别？如何实现？
@@ -320,6 +412,29 @@ const find = (S, T) => {
     ```
 
   - 节流：快速往下滑页面
+  
+#### 79. input 搜索如何防抖，如何处理中文输入
+
+```javascript
+function onCompositionStart(e){
+    e.target.composing = true;
+}
+function onCompositionEnd(e){
+    //console.log(e.target)
+    e.target.composing = false;
+    var event = document.createEvent('HTMLEvents');
+    event.initEvent('input');
+    e.target.dispatchEvent(event);
+}
+var input_dom = document.getElementById('myinput');
+input_dom.addEventListener('input',debounce(1000));
+input_dom.addEventListener('compositionstart',onCompositionStart);
+input_dom.addEventListener('compositionend',onCompositionEnd);
+```
+
+#### 90. 实现模糊搜索结果的关键词高亮显示
+
+- let panter = new RegExp(关键词, 'g') 该行字符串.replace(panter, '<b style="color: #2D7BFF">' + 关键词 + '</b>')
 
 ### 渲染过程、优化
 
@@ -781,17 +896,54 @@ console.log(b) // { n: 1, x: { n: 2 } }
 - ES6 规定，var 命令和 function 命令声明的全局变量，依旧是顶层对象的属 性，但 let 命令、const 命令、class命令声明的全局变量，不属于顶层对象的属性。
 - window输出const和let声明的变量是undefined，所以直接获取就行了
 
-### let
+#### let
 
  1. 作用域：块级作用域。使用`let`在全局作用域中声明的变量不会成为`window`对象的属性。
  2. 没有变量提升，不能重复声明。在`let`声明之前的执行瞬间被称为“暂时性死区”。
  3. `for`循环：`JavaScript`引擎在后台会为每个迭代循环声明一个新的迭代变量。
 
-### const
+#### const
 
 - `const`声明的限制只适用于它指向的变量的引用。如果`const`变量引用的是一个对象，那么修改这个对象内部的属性并不违反`const`的限制。
 
 ### promise
+
+- Promise.allSettled()返回一个在所有给定的promise都已经fulfilled或rejected后的promise，并带有一个对象数组，每个对象表示对应的promise结果。
+- Promise.race(iterable) 方法返回一个 promise，一旦迭代器中的某个promise解决或拒绝，返回的 promise就会解决或拒绝。
+- Promise.all() 方法接收一个promise的iterable类型（注：Array，Map，Set都属于ES6的iterable类型）的输入，并且只返回一个Promise实例， 那个输入的所有promise的resolve回调的结果是一个数组。这个Promise的resolve回调执行是在所有输入的promise的resolve回调都结束，或者输入的iterable里没有promise了的时候。它的reject回调执行是，只要任何一个输入的promise的reject回调执行或者输入不合法的promise就会立即抛出错误，并且reject的是第一个抛出的错误信息。
+
+#### 80. 介绍下 Promise.all 使用、原理实现及错误处理
+
+```javascript
+all(list) {
+  return new Promise((resolve, reject) => {
+    let resValues = [];
+    let counts = 0;
+    for (let [i, p] of list) {
+      resolve(p).then(res => {
+        counts++;
+        resValues[i] = res;
+        if (counts === list.length) {
+            resolve(resValues)
+        }
+      }, err => {
+        reject(err)
+      })
+    }
+  })
+}
+```
+
+#### 89. 设计并实现 Promise.race()
+
+```javascript
+Promise._race = (promises) =>
+  new Promise((resolve, reject) => {
+    promises.forEach((promise) => {
+      promise.then(resolve, reject)
+    })
+  })
+```
 
 #### 42. 实现一个sleep函数
 
@@ -840,6 +992,63 @@ Promise.prototype.finallyNew = function (callback) {
 2. 不可以使用 arguments 对象，该对象在函数体内不存在。如果要用，可以用 rest 参数代替。
 3. 不可以使用 yield 命令，因此箭头函数不能用作 Generator 函数。
 4. 不可以使用 new 命令，因为：没有自己的 this，无法调用 call，apply。没有 prototype 属性 ，而 new 命令在执行时需要将构造函数的 prototype 赋值给新的对象的 __proto__
+
+### proxy
+
+- Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）。
+
+```javascript
+const handler = {
+    get: function(obj, prop) {
+        return prop in obj ? obj[prop] : 37;
+    }
+};
+
+const p = new Proxy({}, handler);
+p.a = 1;
+p.b = undefined;
+
+console.log(p.a, p.b);      // 1, undefined
+console.log('c' in p, p.c); // false, 37
+```
+
+#### 74. 使用 JavaScript Proxy 实现简单的数据绑定
+
+```html
+<body>
+  hello,world
+  <input type="text" id="model">
+  <p id="word"></p>
+</body>
+<script>
+  const model = document.getElementById("model")
+  const word = document.getElementById("word")
+  var obj= {};
+
+  const newObj = new Proxy(obj, {
+      get: function(target, key, receiver) {
+        console.log(`getting ${key}!`);
+        return Reflect.get(target, key, receiver);
+      },
+      set: function(target, key, value, receiver) {
+        console.log('setting',target, key, value, receiver);
+        if (key === "text") {
+          model.value = value;
+          word.innerHTML = value;
+        }
+        return Reflect.set(target, key, value, receiver);
+      }
+    });
+
+  model.addEventListener("keyup",function(e){
+    newObj.text = e.target.value
+  })
+</script>
+```
+
+### Reflect
+
+- Reflect 是一个内置的对象，它提供拦截 JavaScript 操作的方法。将之前的一些不规范的写法进行规范化
 
 ## 算法
 
@@ -974,15 +1183,28 @@ function flatten(arr) {
 console.log(flatten(arr))
 ```
 
-#### 63. 如何设计实现无缝轮播
-
-- 轮播图基本都在ul盒子里面的li元素,首先获取第一个li元素和最后一个li元素,克隆第一个li元素,和最后一个li元素,分别插入到lastli的后面和firstli的前面,然后监听滚动事件,如果滑动距离超过x或-x,让其实现跳转下一张图或者跳转上一张,(此处最好设置滑动距离),然后在滑动最后一张实现最后一张和克隆第一张的无缝转换,当到克隆的第一张的时候停下的时候,,让其切入真的第一张,则实现无线滑动,向前滑动同理
+#### 88. 实现 convert 方法，把原始 list 转换成树形结构，要求尽可能降低时间复杂度
 
 ```javascript
-right.addEventListener('click', (e) => {
-    div.style.transform = `translate(-${(index + 1) * 500}px)`
-    index++
-})
+function convert(list) {
+  const res = []
+  const map = new Map()
+  for (const item of list) {
+    map.set(item.id, item)
+  }
+  for (const item of list) {
+    if (item.parentId === 0) {
+      res.push(item)
+      continue
+    }
+    if (map.get(item.parentId)) {
+      const parent = map.get(item.parentId)
+      parent.children = parent.children || []
+      parent.children.push(item)
+    }
+  }
+  console.log(res)
+}
 ```
 
 ### 排序
@@ -1208,6 +1430,20 @@ function quickSort(arr) {
     1. 验证码；强制用户必须与应用进行交互，才能完成最终请求。此种方式能很好的遏制 csrf，但是用户体验比较差。
     2. Referer check；请求来源限制，此种方法成本最低，但是并不能保证 100% 有效，因为服务器并不是什么时候都能取到 Referer，而且低版本的浏览器存在伪造 Referer 的风险。
     3. token；token 验证的 CSRF 防御机制是公认最合适的方案。若网站同时存在 XSS 漏洞的时候，这个方法也是空谈。
+
+#### 91.介绍下 HTTPS 中间人攻击
+
+- 中间人攻击过程如下：
+  1. 服务器向客户端发送公钥。
+  2. 攻击者截获公钥，保留在自己手上。
+  3. 然后攻击者自己生成一个【伪造的】公钥，发给客户端。
+  4. 客户端收到伪造的公钥后，生成加密hash值发给服务器。
+  5. 攻击者获得加密hash值，用自己的私钥解密获得真秘钥。
+  6. 同时生成假的加密hash值，发给服务器。
+  7. 服务器用私钥解密获得假秘钥。
+  8. 服务器用加秘钥加密传输信息
+
+- 防范方法：服务端在发送浏览器的公钥中加入CA证书，浏览器可以验证CA证书的有效性
 
 ### cookie session
 
