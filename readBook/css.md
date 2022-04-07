@@ -121,4 +121,41 @@
   - `all`属性只接受上面三个全局关键字，表示除`direction`和`unicode-bidi`之外的所有属性
 - 单位
   - `px`像素
-  - 
+  - `em`：相对于当前元素的`font-size`
+  - `rem`：相对于根元素`<html>`的`font-sizes`
+  - `vw`：`1vw`等于视口宽度的`1%`
+  - `vh`：`1vh`等于视口高度的`1%`
+  - `vmin`：取高度和宽度中较小的那个
+  - `vmax`：取高度和宽度中较大的那个
+- 计算值`calc`
+- 颜色
+  - 不透明度：`rgba`，`a`表示不透明度，`0`表示透明，`1`表示完全不透明，十六进制值在最后添加一个十六进制值表示不透明度
+  - 颜色关键字
+    - `transparent`：完全透明的颜色，和`rgba(0,0,0,0)`等效
+    - `currentColor`：当前元素`color`属性计算得到的值
+- 自定义值(`css`变量)：自定义标识符以两个连字符开头(`--`)
+  ```css
+  html{
+    --base-color: #639;
+    --highlight-color: #AFA;
+  }
+  h1{
+    color: var(--base-color);
+  }
+  h2{
+    color: var(--highlight-color)
+  }
+  ```
+
+## 第5章 字体
+
+- `font-family`
+- `@font-face`自定义字体
+  ```css
+  @font-face{
+    font-family: 's';
+    src: url('xxx.otf');
+  }
+  ```
+- `font-weight`字重：`normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900`
+- `font-style: italic|oblique|normal`：斜体和竖直
