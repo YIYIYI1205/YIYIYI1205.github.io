@@ -134,6 +134,7 @@
     - `transparent`：完全透明的颜色，和`rgba(0,0,0,0)`等效
     - `currentColor`：当前元素`color`属性计算得到的值
 - 自定义值(`css`变量)：自定义标识符以两个连字符开头(`--`)
+  
   ```css
   html{
     --base-color: #639;
@@ -151,11 +152,72 @@
 
 - `font-family`
 - `@font-face`自定义字体
+  
   ```css
   @font-face{
     font-family: 's';
     src: url('xxx.otf');
   }
   ```
+
 - `font-weight`字重：`normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900`
-- `font-style: italic|oblique|normal`：斜体和竖直
+- `font-style: italic|oblique|normal`：斜体、倾斜体和竖直
+- `font`：前三个值`font-style | font-weight | font-variant`顺序任意，后两个值`font-size|font-family`必须存在且必须按照这个顺序；也可以在`font-size`中用`/`加入`line-height`；可使用系统字体值，让`web`应用看起来像用户操作系统的原生应用一样
+  - `caption`：说明文字的控件，如按钮
+  - `icon`：图标
+  - `menu`：下拉菜单和菜单列表
+  - `message-box`：对话框
+  - `small-caption`：小型控件
+  - `status-bar`：窗口的状态栏
+
+## 第6章 文本属性
+
+- `text-indent`：缩进，后跟缩进长度，只影响元素的第一行，即使有换行也是如此，会继承
+- `text-align`：文本对齐，`start|end|left|right|center|justify（两端对齐）|match-parent|start end`，只适用于块级元素
+- `line-height`：行的基线之间的距离
+- `vertical-align`：纵向对齐，只能用于行内元素和行内块元素，不能继承，`baseline（默认值）|sub|super|top|text-top|middle|bottom|text-bottom`
+- `word-spacing`：单词间距，默认为`normal`， 结果为`0`
+- `letter-spacing`：字符间距
+- `text-transform`：文本转换，`uppercase(转成大写)|lowercase(转成小写)|capitalize(首字母转成大写)|none`
+- `text-decoration`：文本装饰，`none|underline|overline|line-through|blink`，可以写多个值，不能继承
+- `text-shadow`：文本阴影，值：颜色，第一个长度设置横向偏移，第二个长度设置纵向偏移，可选的第三个长度定义阴影的模糊半径，大量阴影会损耗性能
+- `white-space`：处理`html`中的空白，`normal|nowrap(禁止换行)|pre(也会禁止换行)|pre-wrap|pre-line`
+- `tab-size`：制表符等于多少个空格
+- `word-break`：控制文本软换行(一串文本过长，一行放不下)的方式，`normal|break-all|keep-all`
+- `line-break`
+- `overflow-wrap`：`normal|break-word`，只有`white-space`属性的值允许换行时，`overflow-wrap`才会起作用
+
+## 第7章 视觉格式化基础
+
+- 块级元素：`p|div|h1-h6|ul|li`
+- 行内元素：`a|span`
+- 行内块元素：`input|img`
+- 行内元素可以作为块级元素的后代，但是反过来不行
+- 盒模型：`box-sizing`，`content-box|padding-box|border-box`
+- `width|margin-left|margin-right`可以设置为`auto`
+  - 如果其中一个设为`auto`，另两个设为具体的值，那么设为`auto`的那个属性的具体长度要能满足元素框的宽度等于父元素的宽度
+  
+    ```css
+    div{
+      width: 500px;
+    }
+    p{
+      margin-left: auto; /* 设为auto的左外边距最终计算的结果为300px */
+      margin-right: 100px;
+      width: 100px;
+    }
+    p{
+      margin-left: 100px;
+      margin-right: 100px; /* 等同于右边设置为auto，右外边距被强制设为300px */
+      width: 100px;
+    }
+    p{
+      margin-left: 100px;
+      margin-right: 100px; 
+      width: auto; /* 等同于不写width，中间被强制设为300px */
+    }
+    ```
+  
+  - 如果两个设为`auto`：`margin: auto`，元素居中；`margin-left`和`width`设为`auto`，设为`auto`的`margin`为`0`
+  - 三个都为`auto`，`margin`全为`0`
+- 设置`margin-top`和`margin-bottom`为`auto`，相当于设置为`0`
