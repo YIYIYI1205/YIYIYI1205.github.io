@@ -221,3 +221,5 @@
   - 如果两个设为`auto`：`margin: auto`，元素居中；`margin-left`和`width`设为`auto`，设为`auto`的`margin`为`0`
   - 三个都为`auto`，`margin`全为`0`
 - 设置`margin-top`和`margin-bottom`为`auto`，相当于设置为`0`
+- `margin`和`padding`的百分比是针对于父元素的宽或高
+- 上下外边距会出现塌陷情况
