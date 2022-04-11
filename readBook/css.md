@@ -221,5 +221,41 @@
   - 如果两个设为`auto`：`margin: auto`，元素居中；`margin-left`和`width`设为`auto`，设为`auto`的`margin`为`0`
   - 三个都为`auto`，`margin`全为`0`
 - 设置`margin-top`和`margin-bottom`为`auto`，相当于设置为`0`
-- `margin`和`padding`的百分比是针对于父元素的宽或高
-- 上下外边距会出现塌陷情况
+- 上下外边距会出现塌陷情况，都是正值时会去最大值，但是如果一个是负值，会进行计算。
+- `padding`和`margin`无论`left`还是`right`还是`top`还是`bottom`都是相对于父元素的`width`
+- 父元素的高度在设置`border`时才会真正的显示出包含子元素`margin`
+
+  ```css
+  .one p{
+      margin-top: 2em;
+      margin-bottom: 2em;
+  }
+  .two{
+      border-top: 1px solid red;
+      border-bottom: 1px solid red;
+      background: green;
+  }
+  .two p{
+      margin-top: 2em;
+      margin-bottom: 2em ;
+  }
+  ```
+
+- 行距：`line-height`减去`font-size`，上下分到的空间就是行距除以`2`
+- `line-height`设置为小数，是以当前`font-size`为系数，可以被子元素继承
+- `vertical-align`属性的百分数值是相对元素的`line-height`计算的
+
+## 第8章 内边距、边框、轮廓和外边距
+
+- `margin`和`padding`只有三个值，最后一个左边值由右边值替代
+- `border-style`：`none | hidden | solid | dotted | dashed |double | groove | ridge | inset | outset`
+- `border-radius`：圆角边框，设置完`border`后可进行圆角的设置；如果元素是正方形，设置`border-radius: 50%`，会得到圆形
+- 图像做边框
+
+  ```css
+  .box{
+    border: 25px solid; /* 必须有border，否则不显示*/
+    border-image: url(./2.jpeg);
+    border-image-slice: 1%; /* 没有slice只能显示四个点，设置fill填满 */
+  }
+  ```
