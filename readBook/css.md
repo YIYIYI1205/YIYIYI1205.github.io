@@ -121,8 +121,8 @@
   - `all`属性只接受上面三个全局关键字，表示除`direction`和`unicode-bidi`之外的所有属性
 - 单位
   - `px`像素
-  - `em`：相对于当前元素的`font-size`
-  - `rem`：相对于根元素`<html>`的`font-sizes`
+  - `em`：相对于当前元素的`font-size`，若没有设置，则是`html`的`font-size: 16px`
+  - `rem`：相对于根元素`html`的`font-size`
   - `vw`：`1vw`等于视口宽度的`1%`
   - `vh`：`1vh`等于视口高度的`1%`
   - `vmin`：取高度和宽度中较小的那个
@@ -250,7 +250,7 @@
 - `margin`和`padding`只有三个值，最后一个左边值由右边值替代
 - `border-style`：`none | hidden | solid | dotted | dashed |double | groove | ridge | inset | outset`
 - `border-radius`：圆角边框，设置完`border`后可进行圆角的设置；如果元素是正方形，设置`border-radius: 50%`，会得到圆形
-- 图像做边框
+- 图像做边框：`border`、`border-image`、`border-image-slice`、`border-image-width`、`border-image-repeat`
 
   ```css
   .box{
@@ -259,3 +259,12 @@
     border-image-slice: 1%; /* 没有slice只能显示四个点，设置fill填满 */
   }
   ```
+
+- 轮廓，一般直接绘制在边框外侧，不占空间，可以不是矩形，用户代理通常在元素处于`:focus`状态时渲染轮廓，轮廓更极端，无法单独为一边设置独特的轮廓
+  - `outline-style: auto | none | solid | dotted | dashed | double | groove | ridge | inset | outset`
+  - `outline-width`
+  - `outline-color`
+
+## 第9章 颜色、背景和渐变
+
+- 
