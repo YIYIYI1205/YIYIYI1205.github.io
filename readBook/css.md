@@ -267,4 +267,8 @@
 
 ## 第9章 颜色、背景和渐变
 
-- 
+- `color`会被继承
+- `background-clip`：`border-box | padding-box | content-box | text`，确定的是背景绘制区域
+- `background-position`
+- `background-repeat`：`repeat-x | repeat-y | repeat | space | round | no-repeat`
+- `background-origin`：`border-box | padding-box | content-box`，确定计算源图像的位置时以什么的便捷为基准，定义的是背景定位区域
