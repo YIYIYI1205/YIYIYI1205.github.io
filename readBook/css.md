@@ -272,3 +272,33 @@
 - `background-position`
 - `background-repeat`：`repeat-x | repeat-y | repeat | space | round | no-repeat`
 - `background-origin`：`border-box | padding-box | content-box`，确定计算源图像的位置时以什么的便捷为基准，定义的是背景定位区域
+- `background-attachment`：`scroll | fixed | local`，可以把源图像声明为固定在视区中，从而免受滚动的影响
+- `background-size`：`cover | contain`
+- 线性渐变：`linear-gradient()`，开头是一个可选的方向（角度或`to top | bottom | right | left`），然后列出一系列色标和（或）中色点，结尾又是一个色标；可以使用定位色标`blue 100px`或`blue 20%`
+- 径向渐变：`radial-gradient()`，可以声明形状（`circle | ellipse`）和尺寸（`closest-side | farthest-side | closest-corner | farthest-corner`）（可选），可以声明渐变的中心点在何处（可选），声明两个或多个色标，色标之间还可以指定中色点（可选）
+- `repeating-linear-gradient()`、`repeating-radial-gradient()`
+- `box-shadow`：`inset`表示在内部渲染，剩下的值是长度和颜色
+
+## 第10章 浮动及其形状
+
+- 
+
+## 第11章 定位
+
+## 第12章 弹性盒布局
+
+## 第13章 栅格布局
+
+## 第14章 CSS中的表格布局
+
+## 第15章 列表和生成的内容
+
+## 第16章 变形
+
+## 第17章 过渡
+
+## 第18章 动画
+
+## 第19章 滤镜、混合、裁剪和遮罩
+
+## 第20章 针对特定媒体的样式
