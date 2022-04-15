@@ -281,7 +281,7 @@
 
 ## 第10章 浮动及其形状
 
-- `shape-outside`：规定浮动元素周围的内容按什么形状流动
+- `shape-outside`：规定浮动元素周围的内容按什么形状流动，`inset() | circle() | ellipse() | polygon() | margin-box | border-box | padding-box | content-box`
 
 ## 第11章 定位
 
