@@ -29,6 +29,8 @@
 
 ## 模板语法
 
+- 数据改变后模板会重新解析
+
 ### 插值
 
 - 可以在`{{}}`中写任何`Vue`实例`vm`上的属性以及`Vue`原型上的属性，例如`$options`、`Vue`原型上的`$emit`，`data`中的属性能够使用在插值中也是因为`data`中的属性在`Vue`实例`vm`上
@@ -63,6 +65,7 @@
     - 除此之外的遵循单词小写，连词中间用'-'，如`.caps-lock`
     - 系统修饰键`ctrl | alt | shift | meta`，在使用`@keyup`时，要配合按下其它键，释放其它键时才回触发；使用`@keydown`正常触发；还可以`@keyup.ctrl.y`使用
     - 添加别名：`Vue.config.keyCodes.huiche = 13`
+  - `vm`上没有`window`对象，如果直接`@click='alert(1)'`是不行的，因为`window`不存在，如果不想定义方法直接写语句，最好只写简单的语句
 
 ## 计算属性和侦听器
 
@@ -94,6 +97,74 @@ computed: {
 }
 ```
 
+### 监听器
+
+- 可以监听计算属性
+- 可以使用`vm.$watch()`实现监听
+- 监视属性必须存在才能监视
+- 监视的属性发生变化时调用`handler`函数，可简写
+- `immediate: boolean`是否立即执行函数
+- `deep: boolean`监视多级结构中所有属性的变化，`watch`默认不检测对象内部的改变；`vue`自身可以检测对象内部值的改变
+
+```javascript
+watch{
+  isHot: {
+    // handler在isHot发生改变时调用
+    handler(newValue, oldValue) {
+      this.info = newValue ? '炎热': '凉爽'
+    },
+    // immediate是一个布尔值，在没有发生改变时就执行
+    immediate: true
+  },
+  numbers: {
+    // numbers中每个属性改变，都会触发
+    deep: true,
+    handler(){
+      console.log('change')
+    }
+  }
+}
+```
+
+### 区别
+
+- 监听器需要存在一个属性作为变化的更改，而计算属性直接定义了这个属性，不需要原本就存在
+- 如果需要延迟执行等需求的时候，无法使用计算属性，计算属性是无法开启异步任务的，因为它需要返回值
+
+## Class与Style绑定
+
+- `<div class='basic' :class='color'>`，可以存在`class`以及`:class`
+- `:class=[a,b,c]`还可以传入数组
+- `:class={a: true, b: false}`还可以传入对象
+- 用`:style="{fontSize: fsize + 'px'}"`的形式绑定`style`
+
+## 条件渲染
+
+- `v-show`：`display:none`，不占空间的隐藏元素，切换频率高的情况下使用
+- `v-if`：元素也不存在
+- `v-else`、`v-else-if`
+- 多个判断可以在外层加`<template>`，只能和`v-if`配合使用
+
+## 列表渲染
+
+- `v-for='(item, key) in arr' :key='item.id'`，可遍历对象和数组
+- `key`的作用：虚拟`dom`中的标识，当数据发生变化时，会根据新数据生成新的虚拟`dom`，新的虚拟`dom`与旧的虚拟`dom`进行比较，比较规则：
+  - 旧的虚拟`dom`中找到了与新的虚拟`dom`中相同的`key`
+    - 若虚拟`dom`中内容没变，直接使用之前的真实`dom`
+    - 若虚拟`dom`中内容改变，则生成新的真实`dom`，替换旧的真实`dom`
+  - 旧的虚拟`dom`中没有找到与新的虚拟`dom`中相同的`key`
+    - 创建新的真实`dom`，渲染到页面
+- 用`index`作为`key`在逆序添加、逆序删除等破坏顺序的操作时会引起输入类的`dom`产生`bug`，并且效率低下
+
+```html
+<li v-for='(p, index) of persons' :key='index'>
+  {{p.name}}
+  <!-- 如果添加新的元素时，会出现问题，input框错位 -->
+  <input type='text'> 
+</li>
+```
+  
+
 ## API
 
 ### 全局配置
@@ -105,6 +176,7 @@ computed: {
 ### 选项/数据
 
 - `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果写成箭头函数`this`是全局`window`；`$data`实现数据代理
+- `vm.$watch('a.b.c', function (newVal, oldVal) {})`
 
 ### 选项/DOM
 
