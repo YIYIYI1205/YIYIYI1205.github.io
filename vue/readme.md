@@ -238,3 +238,34 @@ computed: {
   ```
 
 - 数据劫持
+
+
+
+
+
+以下：都和Object.definedPrototype有关系
+
+数据代理：vm._data=data
+数据监测：setter方法中需要调用reactiveSetter，而不存在的属性通过vm直接添加是无法进行代理的，因此需要使用set方法
+数据劫持：原本一个对象，变成了含有`get|set`方法的对象，这种变化叫做数据劫持
+
+`vue.student.slice(0, 1, {name: '1111'}`
+`vue.student.push === Array.prototype.push // false`
+
+- `vue`会检测`data`中所有层次的数据
+- 通过`setter`实现数据的监测，且要在`new Vue`时就传入监测的数据
+  - 对象中后追加的属性，`vue`默认不做响应式处理
+  - 如需给后追加的属性做响应式，会用`Vue.set()`或`vm.$set()`
+- 监测数组中的数据：通过包裹数组更新元素的方法实现
+  - 调用原生对应的方法对数组进行更新
+  - 重新解析模板，进而更新页面
+- 在`vue`中修改数组的某个元素
+  - `push | pop | shift | unshift | slice | sort | reverse`
+  - `vm.$set() | Vue.set()`
+- `vm.$set() | Vue.set()`不能给`vm`或者`vm_data`对象添加属性
+
+- form中的Button提交会刷新页面，在form中配置@submit.prevent
+- v-model修饰符
+  - v-model.number
+  - v-model.lazy，失去焦点的一瞬间收集
+  - v-model.trim删除空格
