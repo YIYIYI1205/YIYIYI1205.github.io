@@ -163,7 +163,26 @@ watch{
   <input type='text'> 
 </li>
 ```
-  
+
+```html
+<!-- 实现搜索过滤功能 -->
+<!-- 1. 监听器实现 -->
+watch: {
+  keyWord: {
+    <!-- 为了初始化显示全量列表，先执行一遍为空时的搜索 -->
+    immediate: true,
+    handler(val) {
+      this.filPersons = this.persons.filter((p) => p.name.indexOf(val) !== -1)
+    }
+  }
+}
+<!-- 2. 计算属性实现 -->
+computed: {
+  filPersons() {
+    return this.persons.filter((p) => p.name.indexOf(this.keyWord) !== -1)
+  }
+}
+```
 
 ## API
 
