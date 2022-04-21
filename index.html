@@ -10,30 +10,26 @@
 
 <body>
     <div id="root">
-        输入：<input type="text">
-
+        输入：<input v-model="name" type="text">
+        <ul>
+            <li v-for="p in student">
+                {{p.name}}-{{student.sex}}
+            </li>
+        </ul>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script>
         const vm = new Vue({
             el: '#root',
             data: {
-               persons: [{
-                   name: '周杰伦', id: 1
-               },{
-                   name: '周冬雨', id: 2
-               },{
-                   name: '马冬梅', id: 3
-               },{
-                   name: '马化腾', id: 4
-               }]
-            },
-            computed: {
-                filPersons() {
-                    return this.persons.filter(p => p.name.indexOf())
-                }
+                name: '123',
+                student: [{
+                    name: '123', age: 234
+                }]
             }
         })
+        Vue.set(vm._data.student[0], 'name', '234')
+        console.log(vm)
     </script>
 </body>
 

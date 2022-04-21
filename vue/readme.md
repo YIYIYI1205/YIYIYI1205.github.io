@@ -34,6 +34,7 @@
 ### 插值
 
 - 可以在`{{}}`中写任何`Vue`实例`vm`上的属性以及`Vue`原型上的属性，例如`$options`、`Vue`原型上的`$emit`，`data`中的属性能够使用在插值中也是因为`data`中的属性在`Vue`实例`vm`上
+- `undefined`不显示，并且如果从对象中找一个不存在的属性也不会报错
 
 ### 指令
 
@@ -164,19 +165,19 @@ watch{
 </li>
 ```
 
-```html
-<!-- 实现搜索过滤功能 -->
-<!-- 1. 监听器实现 -->
+```javascript
+// 实现搜索过滤功能
+// 1. 监听器实现
 watch: {
   keyWord: {
-    <!-- 为了初始化显示全量列表，先执行一遍为空时的搜索 -->
+    // 为了初始化显示全量列表，先执行一遍为空时的搜索
     immediate: true,
     handler(val) {
       this.filPersons = this.persons.filter((p) => p.name.indexOf(val) !== -1)
     }
   }
 }
-<!-- 2. 计算属性实现 -->
+// 2. 计算属性实现
 computed: {
   filPersons() {
     return this.persons.filter((p) => p.name.indexOf(this.keyWord) !== -1)
@@ -184,13 +185,56 @@ computed: {
 }
 ```
 
+- 更改数组对象中的某一条元素时，如果直接替换对象，是无效的
+- 数据代理中的`set`方法中有一个重新解析页面的响应式`reactiveSetter`，能够实现对对象属性的监视
+
+```javascript
+this.persons[0].name ='x' // 有效
+this.persons[0] = { name: 'x' } // 无效，vue不能检测到数据更改了，实际已经改正了，输入vm会发现已改变
+```
+
+```javascript
+// 模拟数据监测
+const data = {
+  name: 'xxx',
+  address: 'yyy'
+}
+const vm = {}
+const obs = new Observer(data)
+console.log(obs)
+vm._data = data = obs // 没有将data直接代理到vm身上
+console.log(vm)
+function Observer(obj) {
+  const keys = Object.keys(obj)
+  keys.forEach((k) => { // 只考虑了一层数据，需要用递归实现
+    Object.defineProperty(this, k, { 
+      get() {
+        return obj[k]
+      },
+      set(val) {
+        obj[k] = val
+      }
+    })
+  })
+}
+```
+
 ## API
 
 ### 全局配置
 
-- `vue.config`文件
+- `Vue.config`文件
   - 阻止`vue`在启动时生成生产提示：`Vue.config.productionTip = false`
   - 添加按键别名：`Vue.config.keyCodes.huiche = 13`
+
+### 全局API
+
+- `Vue.set(target, propertyName/index, value)`
+  - 当一个对象中不存在某个属性，直接用`vue._ data.name`设置的数据，无法数据代理到`vm`身上，因为直接赋值没有数据代理的`set`和`get`方法
+  - 应该使用`Vue.set(vm.student, 'set', '男'`添加新的属性，使用`vm.$set`是同样的
+  - 不能直接给`vm._data`追加，必须给里面具体的属性追加属性
+  - 数组上并不存在关于`arr[0]`的`set`和`get`，因此直接修改`vm.arr[0] = {}`是无法让页面有响应的，需要`vm.$set(this.arr, 0, {})`
+  - 数组修改自身的方法`push|pop|shift|unshift|splice|sort|reverse`，是不需要使用`set`就可以响应到页面的，这些方法被`vue`包裹，因此页面可以响应引起视图更新
 
 ### 选项/数据
 
