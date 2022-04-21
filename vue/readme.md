@@ -40,6 +40,11 @@
 
 - 属性绑定动态值：`v-bind:属性='变量'`或`:属性 ='变量'`，单向数据绑定
 - 双向数据绑定：`v-model`，只能应用到有`value`的表单类元素上
+  - `form`中的`Button`提交会刷新页面，在`form`中配置`@submit.prevent`
+  - `v-model`修饰符
+    - `v-model.number`
+    - `v-model.lazy`，失去焦点的一瞬间收集数据
+    - `v-model.trim`删除空格
 - 事件处理：`v-on:click="函数名"`或`@click`，配合`methods`定义方法，普通函数`this`指向`vm`，若不传参，默认第一个参数为`event`；若传别的参数，用`$event`传递`event`，`@click=handleClick($event, params1)`；`methods`中定义的方法也在`vm`对象身上，但是不是数据代理，`data`会被数据代理，而`methods`不会，因此如果在`data`中写方法也可以使用，但是浪费资源
   - 事件修饰符，可以连写
     - 阻止默认事件：`@click.prevent`
@@ -185,8 +190,173 @@ computed: {
 }
 ```
 
-- 更改数组对象中的某一条元素时，如果直接替换对象，是无效的
+## 可复用性 & 组合
+
+### 自定义指令
+
+- 配置项：`directives`，生命周期：`bind | inserted | update`，参数：`element | binding`
+- 普通函数：`bing + update`，调用：1. 指令与元素成功绑定时会被调用；2. 指令所在的模板被重新解析时会被调用（不是所依赖的数据变化时才变）
+- 指令名：`big-number`，不要用驼峰式
+- `this`指向`window`，如果指向`vm`就不需要`element`了
+- 全局指令：`Vue.directive`
+
+```html
+<div id='root'>
+  <span v-big='n'></span>
+</div>
+<script>
+  const vm = new Vue({
+    el: '#root',
+    data: {
+      n: 1
+    },
+    directives: {
+      // 1. 指令与元素成功绑定时会被调用；2. 指令所在的模板被重新解析时会被调用（不是所依赖的数据变化时才变）
+      big(element, binding) {
+        element.innerText = binding.value * 10
+      },
+      focusBind(element, binding) {
+         element.innerText = binding.value
+         element.focus() // 无效，因为第一次执行是指令与元素成功绑定时执行，此时元素还没有放入页面中
+         // 当binding.value改变时，再次调用指令，此时元素已经放入页面，因此focus有效
+      },
+      focusBind: {
+        // 指令与元素成功绑定时
+        bind(element, binding) {
+          element.innerText = binding.value
+        },
+        // 指令所在元素被插入页面时
+        inserted(element, binding) {
+          element.focus()
+        },
+        // 指令所在的模板被重新解析时
+        update(element, binding) {
+          element.innerText = binding.value
+        }
+      }
+    }
+  })
+</script>
+```
+
+### 过滤器
+
+- 使用：`数据 | 过滤器(传参)`
+- 定义：`filters{ 过滤器(数据，参数='默认值') {return }}`，如果需要有传参的情况下，需要给个默认值
+- 多个过滤器之间可以串联，从左往右的顺序执行
+- 配置全局过滤器：`Vue.filter()`
+- 可以配合`v-bind`使用，但不能配合`v-model`使用
+
+## API
+
+### 全局配置
+
+- `Vue.config`文件
+  - 阻止`vue`在启动时生成生产提示：`Vue.config.productionTip = false`
+  - 添加按键别名：`Vue.config.keyCodes.huiche = 13`
+
+### 全局API
+
+- `Vue.set(target, propertyName/index, value)`
+  - 当一个对象中不存在某个属性，直接用`vue._ data.name`设置的数据，无法数据代理到`vm`身上，因为直接赋值没有数据代理的`set`和`get`方法
+  - 应该使用`Vue.set(vm.student, 'set', '男'`添加新的属性，使用`vm.$set`是同样的
+  - 不能直接给`vm._data`追加，必须给里面具体的属性追加属性
+  - 数组上并不存在关于`arr[0]`的`set`和`get`，因此直接修改`vm.arr[0] = {}`是无法让页面有响应的，需要`vm.$set(this.arr, 0, {})`
+  - 数组修改自身的方法`push|pop|shift|unshift|splice|sort|reverse`，是不需要使用`set`就可以响应到页面的，这些方法被`vue`包裹，因此页面可以响应引起视图更新
+    - `vue.student.slice(0, 1, {name: '1111'}`
+    - `vue.student.push === Array.prototype.push // false`
+- `Vue.directive`
+- `Vue.filter`
+
+### 选项/数据
+
+- `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果写成箭头函数`this`是全局`window`；`$data`实现数据代理
+- `vm.$watch('a.b.c', function (newVal, oldVal) {})`
+
+### 选项/DOM
+
+- `$mount`绑定元素，类似`el`；`vm.$mount('#root')`
+
+### 选项/生命周期钩子
+
+- 初始化过程：
+  - `new Vue()`
+  - 初始化：生命周期、事件，但数据代理还未开始
+  - `beforeCreate`：无法通过`vm`访问到`data`中的数据、`methods`中的方法，`vm`是创建了的 
+  - 初始化：数据监测、数据代理
+  - `created`：可以通过`vm`访问到`data`中的数据、`methods`中的方法
+  - 是否有`el`配置：没有则通过`vm.$mount(el)`调用后再往下走
+  - 是否有`template`配置：没有则编译整个`el`作为模板；有则编译`template`，但是要替换掉`el`。此阶段`vue`开始解析模板，生成虚拟`dom`(内存中)，页面还不能显示解析好的内容
+  - `beforeMount`：页面呈现的是未经`Vue`编译的`dom`结构，所有对`dom`的操作，最终都不奏效，因为后面会进行虚拟`dom`的替换
+  - 创建`vm.$el`替换`el`，将内存中的虚拟`dom`转为真实`dom`插入页面
+  - `mounted`：页面呈现的是经过`Vue`编译的`dom`结构，所有对`dom`的操作有效（尽可能避免）。此时初始化过程结束，一般在此进行：开启定时器、发送网络请求、订阅消息、绑定自定义事件等初始化操作
+- 更新流程，当数据改变时：
+  - `beforeUpdate`：数据是新的，页面还是旧的
+  - 根据新数据，生成新的虚拟`dom`，与旧的虚拟`dom`进行比较，最红完成页面更新
+  - `updated`：数据和页面保持同步
+
+### 指令
+
+- `v-text`等价于差值语法
+- `v-html`，容易导致`xss`攻击，可以给`cookie`设置`HttpOnly`，就不可以通过`js`脚本的`document.cookie`获取了
+- `v-pre`：可以用它跳过没有使用指令语法、插值语法的节点，会加快编译
+- `v-cloak`：网速过慢时，配合`css`实现脚本还未加载时插值语句不显示`[v-cloak]{display: none}`，`vue`请求回来执行时会将元素上的`v-cloak`删除
+- `v-once`：只渲染元素和组件一次，初次动态渲染后就变成静态资源了
+
+## 原理
+
+### Object.defineProperty
+
+- `Object.defineProperty(obj, prop, descriptor)`
+- `descriptor`配置项
+  - `value`
+  - `enumerable`可枚举的
+  - `writable`可写的
+  - `configurable`可删除的
+  - `get`读取时调用，使用`get`更改过的属性，输出时值显示`(...)`，点击后才会显示
+  - `set(value)`修改时调用
+
+#### 数据代理
+
+- 一个对象代理对另一个对象中属性的操作(读/写)
+- `vm`上的属性是通过数据代理添加的，`data`被存在`vm._data = data`，`vm._data === vm.$data`
+- 如果不进行数据代理，那么属性要写成`{{_data.name}}`，数据代理为了让编码更方便
+  
+  ```javascript
+  const data = {
+    name: 'xxx'
+  }
+  const vm = new Vue({
+    el: '#root',
+    data
+  })
+  // 控制台输出 vm._data = data  true
+  // 内部 vm._data = options.data = data
+  Object.defineProperty(vm, 'name', {
+    get() {
+      return vm._data.name
+    },
+    set(value) {
+      vm._data.name = value
+    }
+  })
+  ```
+
+#### 数据监测
+
+- `vue`会检测`data`中所有层次的数据
 - 数据代理中的`set`方法中有一个重新解析页面的响应式`reactiveSetter`，能够实现对对象属性的监视
+- 通过`setter`实现数据的监测，且要在`new Vue`时就传入监测的数据
+  - 对象中后追加的属性，`vue`默认不做响应式处理
+  - 如需给后追加的属性做响应式，会用`Vue.set()`或`vm.$set()`
+- 监测数组中的数据：通过包裹数组更新元素的方法实现
+  - 调用原生对应的方法对数组进行更新
+  - 重新解析模板，进而更新页面
+- 在`vue`中修改数组的某个元素
+  - 更改数组对象中的某一条元素时，如果直接替换对象，是无效的
+  - `push | pop | shift | unshift | slice | sort | reverse`
+  - `vm.$set() | Vue.set()`
+- `vm.$set() | Vue.set()`不能给`vm`或者`vm_data`对象添加属性
 
 ```javascript
 this.persons[0].name ='x' // 有效
@@ -219,97 +389,7 @@ function Observer(obj) {
 }
 ```
 
-## API
-
-### 全局配置
-
-- `Vue.config`文件
-  - 阻止`vue`在启动时生成生产提示：`Vue.config.productionTip = false`
-  - 添加按键别名：`Vue.config.keyCodes.huiche = 13`
-
-### 全局API
-
-- `Vue.set(target, propertyName/index, value)`
-  - 当一个对象中不存在某个属性，直接用`vue._ data.name`设置的数据，无法数据代理到`vm`身上，因为直接赋值没有数据代理的`set`和`get`方法
-  - 应该使用`Vue.set(vm.student, 'set', '男'`添加新的属性，使用`vm.$set`是同样的
-  - 不能直接给`vm._data`追加，必须给里面具体的属性追加属性
-  - 数组上并不存在关于`arr[0]`的`set`和`get`，因此直接修改`vm.arr[0] = {}`是无法让页面有响应的，需要`vm.$set(this.arr, 0, {})`
-  - 数组修改自身的方法`push|pop|shift|unshift|splice|sort|reverse`，是不需要使用`set`就可以响应到页面的，这些方法被`vue`包裹，因此页面可以响应引起视图更新
-
-### 选项/数据
-
-- `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果写成箭头函数`this`是全局`window`；`$data`实现数据代理
-- `vm.$watch('a.b.c', function (newVal, oldVal) {})`
-
-### 选项/DOM
-
-- `$mount`绑定元素，类似`el`；`vm.$mount('#root')`
-
-## 原理
-
-### Object.defineProperty
-
-- `Object.defineProperty(obj, prop, descriptor)`
-- `descriptor`配置项
-  - `value`
-  - `enumerable`可枚举的
-  - `writable`可写的
-  - `configurable`可删除的
-  - `get`读取时调用，使用`get`更改过的属性，输出时值显示`(...)`，点击后才会显示
-  - `set(value)`修改时调用
-- 数据代理：一个对象代理对另一个对象中属性的操作(读/写)
-- `vm`上的属性是通过数据代理添加的，`data`被存在`vm._data = data`，`vm._data === vm.$data`
-- 如果不进行数据代理，那么属性要写成`{{_data.name}}`，数据代理为了让编码更方便
-  
-  ```javascript
-  const data = {
-    name: 'xxx'
-  }
-  const vm = new Vue({
-    el: '#root',
-    data
-  })
-  // 控制台输出 vm._data = data  true
-  // 内部 vm._data = options.data = data
-  Object.defineProperty(vm, 'name', {
-    get() {
-      return vm._data.name
-    },
-    set(value) {
-      vm._data.name = value
-    }
-  })
-  ```
-
-- 数据劫持
-
-
-
-
-
-以下：都和Object.definedPrototype有关系
-
-数据代理：vm._data=data
-数据监测：setter方法中需要调用reactiveSetter，而不存在的属性通过vm直接添加是无法进行代理的，因此需要使用set方法
-数据劫持：原本一个对象，变成了含有`get|set`方法的对象，这种变化叫做数据劫持
-
-`vue.student.slice(0, 1, {name: '1111'}`
-`vue.student.push === Array.prototype.push // false`
-
-- `vue`会检测`data`中所有层次的数据
-- 通过`setter`实现数据的监测，且要在`new Vue`时就传入监测的数据
-  - 对象中后追加的属性，`vue`默认不做响应式处理
-  - 如需给后追加的属性做响应式，会用`Vue.set()`或`vm.$set()`
-- 监测数组中的数据：通过包裹数组更新元素的方法实现
-  - 调用原生对应的方法对数组进行更新
-  - 重新解析模板，进而更新页面
-- 在`vue`中修改数组的某个元素
-  - `push | pop | shift | unshift | slice | sort | reverse`
-  - `vm.$set() | Vue.set()`
-- `vm.$set() | Vue.set()`不能给`vm`或者`vm_data`对象添加属性
-
-- form中的Button提交会刷新页面，在form中配置@submit.prevent
-- v-model修饰符
-  - v-model.number
-  - v-model.lazy，失去焦点的一瞬间收集
-  - v-model.trim删除空格
+- 以下：都和`Object.definedPrototype`有关系
+  - 数据代理：`vm._data=data`
+  - 数据监测：`setter`方法中需要调用`reactiveSetter`，而不存在的属性通过`vm`直接添加是无法进行代理的，因此需要使用`set`方法
+  - 数据劫持：原本一个对象，变成了含有`get|set`方法的对象，这种变化叫做数据劫持
