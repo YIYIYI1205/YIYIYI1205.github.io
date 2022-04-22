@@ -40,11 +40,6 @@
 
 - 属性绑定动态值：`v-bind:属性='变量'`或`:属性 ='变量'`，单向数据绑定
 - 双向数据绑定：`v-model`，只能应用到有`value`的表单类元素上
-  - `form`中的`Button`提交会刷新页面，在`form`中配置`@submit.prevent`
-  - `v-model`修饰符
-    - `v-model.number`
-    - `v-model.lazy`，失去焦点的一瞬间收集数据
-    - `v-model.trim`删除空格
 - 事件处理：`v-on:click="函数名"`或`@click`，配合`methods`定义方法，普通函数`this`指向`vm`，若不传参，默认第一个参数为`event`；若传别的参数，用`$event`传递`event`，`@click=handleClick($event, params1)`；`methods`中定义的方法也在`vm`对象身上，但是不是数据代理，`data`会被数据代理，而`methods`不会，因此如果在`data`中写方法也可以使用，但是浪费资源
   - 事件修饰符，可以连写
     - 阻止默认事件：`@click.prevent`
@@ -190,6 +185,20 @@ computed: {
 }
 ```
 
+### 表单输入绑定
+
+- `form`中的`Button`提交会刷新页面，在`form`中配置`@submit.prevent`
+- `v-model`修饰符
+  - `v-model.number`
+  - `v-model.lazy`，失去焦点的一瞬间收集数据
+  - `v-model.trim`删除空格
+
+## 组件
+
+- 组件：实现应用中局部功能代码和资源的集合
+- 模块化：对于`js`文件
+- 非单文件组件：用`Vue.extend`定义子组件，`data`用函数的形式，不能写`el`配置项，因为所有组件都要被一个`vm`管理；在`new Vue`中配合子组件`components: {子组件}`注册局部组件；`Vue.component('hello', hello)`注册全局组件
+
 ## 可复用性 & 组合
 
 ### 自定义指令
@@ -257,6 +266,7 @@ computed: {
 
 ### 全局API
 
+- `Vue.extend(options)`：创建子类，`data`必须是函数，因为若`data`是对象，会出现指向同一个对象地址；不能写`el`
 - `Vue.set(target, propertyName/index, value)`
   - 当一个对象中不存在某个属性，直接用`vue._ data.name`设置的数据，无法数据代理到`vm`身上，因为直接赋值没有数据代理的`set`和`get`方法
   - 应该使用`Vue.set(vm.student, 'set', '男'`添加新的属性，使用`vm.$set`是同样的
@@ -265,24 +275,21 @@ computed: {
   - 数组修改自身的方法`push|pop|shift|unshift|splice|sort|reverse`，是不需要使用`set`就可以响应到页面的，这些方法被`vue`包裹，因此页面可以响应引起视图更新
     - `vue.student.slice(0, 1, {name: '1111'}`
     - `vue.student.push === Array.prototype.push // false`
-- `Vue.directive`
-- `Vue.filter`
+- `Vue.directive(id, [definition])`：注册或获取全局指令
+- `Vue.filter(id, [definition])`：注册或获取全局过滤器
+- `Vue.component(id, [definition])`：注册或获取全局组件
 
 ### 选项/数据
 
 - `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果写成箭头函数`this`是全局`window`；`$data`实现数据代理
 - `vm.$watch('a.b.c', function (newVal, oldVal) {})`
 
-### 选项/DOM
-
-- `$mount`绑定元素，类似`el`；`vm.$mount('#root')`
-
 ### 选项/生命周期钩子
 
 - 初始化过程：
   - `new Vue()`
   - 初始化：生命周期、事件，但数据代理还未开始
-  - `beforeCreate`：无法通过`vm`访问到`data`中的数据、`methods`中的方法，`vm`是创建了的 
+  - `beforeCreate`：无法通过`vm`访问到`data`中的数据、`methods`中的方法，`vm`是创建了的，因此`create`创建的是数据相关
   - 初始化：数据监测、数据代理
   - `created`：可以通过`vm`访问到`data`中的数据、`methods`中的方法
   - 是否有`el`配置：没有则通过`vm.$mount(el)`调用后再往下走
@@ -294,6 +301,15 @@ computed: {
   - `beforeUpdate`：数据是新的，页面还是旧的
   - 根据新数据，生成新的虚拟`dom`，与旧的虚拟`dom`进行比较，最红完成页面更新
   - `updated`：数据和页面保持同步
+- 销毁流程：
+  - `vm.$destroy()`调用时
+  - `beforeDestroy`：`vm`中的所有`data`、`methods`、指令等等都处于可用状态，但是页面不会变化，马上要执行销毁过程，一般在此阶段：关闭定时器、取消订阅消息、解绑自定义事件等收尾操作
+  - `destroyed`
+
+### 实例方法/生命周期
+
+- `vm.$mount()`：手动挂载一个未挂载的实例，类似`el`；`vm.$mount('#root')`
+- `vm.$destroy()`：完全销毁一个实例，清绑理它与其它实例的连接，解它的全部指令及自定义事件监听器，但是原生事件依然有效；大多数场景不应该调用，最好用`v-if | v-for`以数据驱动的方式控制子组件的生命周期
 
 ### 指令
 
