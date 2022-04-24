@@ -206,6 +206,11 @@ computed: {
   - 可配置`name`参数指定组件在开发者工具中的名称
   - 非脚手架环境下有大写、自闭合组件`bug`
   - 可简写为`const school = options`
+  - `VueComponent`
+    - 每一个组件本质上是一个`VueComponent`构造函数，是由`Vue.extend`生成的
+    - 在使用组件时，`Vue`在解析时执行`new VueComponent(options)`创建组件的实例对象
+    - 每次调用`Vue.extend`，返回的都是一个新的`VueComponent`，每一次`Vue.extend`都会返回一个新定义的`function VueComponent`
+    - `this`指向：`new Vue`配置中，`this`指向`Vue`实例对象(`vm`)；组件配置中，`this`指向`VueComponent`实例对象(`vc`)；`vm`的`$children`中包含`vc`
 
 ## 可复用性 & 组合
 
