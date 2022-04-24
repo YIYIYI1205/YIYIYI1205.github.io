@@ -197,7 +197,15 @@ computed: {
 
 - 组件：实现应用中局部功能代码和资源的集合
 - 模块化：对于`js`文件
-- 非单文件组件：用`Vue.extend`定义子组件，`data`用函数的形式，不能写`el`配置项，因为所有组件都要被一个`vm`管理；在`new Vue`中配合子组件`components: {子组件}`注册局部组件；`Vue.component('hello', hello)`注册全局组件
+- 非单文件组件
+  - 用`Vue.extend`定义子组件
+  - `data`用函数的形式
+  - 不能写`el`配置项，因为所有组件都要被一个`vm`管理
+  - 在`new Vue`中配合子组件`components: {子组件}`注册局部组件
+  - `Vue.component('hello', hello)`注册全局组件
+  - 可配置`name`参数指定组件在开发者工具中的名称
+  - 非脚手架环境下有大写、自闭合组件`bug`
+  - 可简写为`const school = options`
 
 ## 可复用性 & 组合
 
