@@ -207,10 +207,12 @@ computed: {
   - 非脚手架环境下有大写、自闭合组件`bug`
   - 可简写为`const school = options`
   - `VueComponent`
-    - 每一个组件本质上是一个`VueComponent`构造函数，是由`Vue.extend`生成的
+    - 每一个组件本质上是一个`VueComponent`构造函数，是由`Vue.extend`生成的，`school = Vue.extend`，`school`拥有`prototype`，是一个`VueComponent`构造函数
     - 在使用组件时，`Vue`在解析时执行`new VueComponent(options)`创建组件的实例对象
     - 每次调用`Vue.extend`，返回的都是一个新的`VueComponent`，每一次`Vue.extend`都会返回一个新定义的`function VueComponent`
     - `this`指向：`new Vue`配置中，`this`指向`Vue`实例对象(`vm`)；组件配置中，`this`指向`VueComponent`实例对象(`vc`)；`vm`的`$children`中包含`vc`
+    - 内置关系：`VueComponent.prototype.__proto__ === Vue.prototype`，让`vc`可以访问到`vue`原型上的属性、方法
+- 单文件组件：定义组件：`export default {name: ''}`，`Vue.extend`可以省略；入口`app.vue`，引入组件；在`main.js`创建`vm`，引入`app组件`；在`index.html`中引入`main.js`
 
 ## 可复用性 & 组合
 
@@ -422,3 +424,14 @@ function Observer(obj) {
   - 数据代理：`vm._data=data`
   - 数据监测：`setter`方法中需要调用`reactiveSetter`，而不存在的属性通过`vm`直接添加是无法进行代理的，因此需要使用`set`方法
   - 数据劫持：原本一个对象，变成了含有`get|set`方法的对象，这种变化叫做数据劫持
+
+### 原型
+
+- `prototype`显式原型属性，函数才有，实例没有
+- `__proto__`隐式原型属性，函数和实例都有
+- 两者都是执行原型对象`Demo.prototype === prototype.__proto__`
+- 通过显式原型属性操作原型对象：`Demo.prototype.x`，通过隐式原型属性获取对象属性
+- 内置关系：`VueComponent.prototype.__proto__ === Vue.prototype`，让`vc`可以访问到`vue`原型上的属性、方法
+
+## 脚手架
+

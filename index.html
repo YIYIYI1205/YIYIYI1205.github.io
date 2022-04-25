@@ -29,7 +29,15 @@
             }
         })
         Vue.set(vm._data.student[0], 'name', '234')
-        console.log(vm)
+        const school = Vue.extend({
+            data() {
+                return 123
+            }
+        })
+        console.log(vm.__proto__ === Vue.prototype)
+        console.log(Vue.prototype.__proto__ === Object.prototype)
+        console.log(school.__proto__.prototype === Vue.prototype );
+
     </script>
 </body>
 
