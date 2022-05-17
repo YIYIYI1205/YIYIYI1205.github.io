@@ -167,12 +167,6 @@ console.log([...arr1].sort((a, b) => a-b))
 console.log(Array.from(arr1).sort((a, b) => a-b))
 ```
 
-#### 21. 三个判断数组的方法，请分别介绍它们之间 的区别和优劣
-
-- Array.prototype.toString.call(arr) ：这种方法对于所有基本的数据类型都能进行判断，即使是 null 和 undefined 
-- Array.isArray(arr)：当检测 Array 实例时，Array.isArray 优于 instanceof ，因为 Array.isArray 可以 检测出 iframes
-- arr instanceof Array：instanceof 只能用来判断对象类型，原始类型不可以。并且所有对象类型 instanceof Object 都是 true；instanceof 底层原理是检测构造函数的 prototype 属性是否出现在某个实例的原型链上，如果实例的原型链发生变化，则无法做出正确判断。
-- arr.constructor === Array
 
 ```javascript
 var a = ?;
@@ -388,30 +382,6 @@ const isUrl = urlStr => {
 ```
 
 ### 作用域、优化
-
-#### 3. 什么是防抖和节流？有什么区别？如何实现？
-
-- 考点：闭包，变量提升
-  - 防抖：输入框
-
-    ```javascript
-    function debounce(fn, wait) {
-      let timer = null
-      return () => {
-        const context = this
-        if (timer !== null) {
-          clearTimeout(timer)
-        }
-        timer = setTimeout(() => {
-          fn(...arguments)
-          // 不用箭头函数
-          fn.apply(context, arguments)
-        }, wait)
-      }
-    }
-    ```
-
-  - 节流：快速往下滑页面
   
 #### 79. input 搜索如何防抖，如何处理中文输入
 

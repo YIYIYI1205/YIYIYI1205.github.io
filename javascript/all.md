@@ -33,15 +33,6 @@ function ajax(url) {
 
 - `Array.prototype.slice`：`slice()`方法返回一个新的数组对象，这一对象是一个由`begin`和`end`决定的原数组的浅拷贝（包括`begin`，不包括`end`）。原始数组不会被改变。
 
-### 判断数组的方法[没看]
-
-1. arr instanceof Array
-2. arr.constructor === Array       任何对象都有constructor  并不是只有构造函数才有
-3. Array.prototype.isPrototypeOf(arr)
-4. Object.getPrototypeOf(arr) === Array.prototype
-5. Object.prototype.toString.call(arr) === '[object Array]'
-6. Array.isArray(arr)
-
 ## 函数式编程-高阶函数
 
 ### 纯函数
@@ -168,67 +159,6 @@ for(i=0;i<10;i++){
 - 闭包实现防抖
 - 闭包：为了去访问外部的变量
 - 使用场景是因为防抖定义了一个变量`timer`，每次都需要去判断这个参数是否为null，如果定义全局变量会造成污染，因此用闭包解决
-
-## 防抖、节流
-
-- 防抖：只要在延迟时间内执行，就会`clear timeout`，例如输入框防抖
-- 节流：规定的延迟时间内必然会执行一次。比如在页面的无限加载场景下，我们需要用户在滚动页面时，每隔一段时间发一次`Ajax`请求，而不是在用户停下滚动页面操作时才去请求数据。这样的场景，就适合用节流技术来实现。
-
-```javascript
-// 防抖
-function debounce(fn, wait) {
-    let timer = null
-    return () => {
-        const context = this
-        if (timer !== null) {
-            clearTimeout(timer)
-        }
-        timer = setTimeout(() => {
-            fn(...arguments)
-            // 不用箭头函数
-            fn.apply(context, arguments)
-        }, wait)
-    }
-}
-function fn() {
-    console.log(arguments)
-    console.log(input.value)
-}
-const input = document.getElementById('input')
-input.addEventListener('keyup', debounce(fn, 1000))
-// debounce会直接执行，里面的函数会在keyup出发时执行，因此可以将e传进去
-```
-
-```javascript
-// 方法一：定时器实现
-const throttle = function (fn, delay) {
-  let timer = null
-  return function () {
-    const context = this
-    let args = arguments
-    if (!timer) {
-      timer = setTimeout(() => {
-        fn.apply(context, args)
-        clearTimeout(timer)
-      }, delay)
-    }
-    //如果定时器存在什么都不做，定时器不存在就创建定时器
-  }
-}
-// 方法二：时间戳
-const throttle2 = function (fn, delay) {
-  let preTime = Date.now()
-  return function () {
-    const context = this
-    let args = arguments
-    let doTime = Date.now()
-    if (doTime - preTime >== delay) {
-      fn.apply(context, args)
-      preTime = Date.now()
-    }
-  }
-}
-```
 
 ## 深拷贝、浅拷贝
 

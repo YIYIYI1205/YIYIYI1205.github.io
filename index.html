@@ -1,44 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-
 <body>
-    <div id="root">
-        输入：<input v-model="name" type="text">
-        <ul>
-            <li v-for="p in student">
-                {{p.name}}-{{student.sex}}
-            </li>
-        </ul>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <input id="input" type="text">输入
     <script>
-        const vm = new Vue({
-            el: '#root',
-            data: {
-                name: '123',
-                student: [{
-                    name: '123', age: 234
-                }]
+        const input = document.getElementById('input')
+        function debounce(fn, delay){
+            let timer = null
+            return function() {
+                const context = this
+          
+                if (timer) {
+                    clearTimeout(timer)
+                }
+                timer = setTimeout(() => {
+                    fn.apply(context, arguments)
+                }, delay)
             }
-        })
-        Vue.set(vm._data.student[0], 'name', '234')
-        const school = Vue.extend({
-            data() {
-                return 123
-            }
-        })
-        console.log(vm.__proto__ === Vue.prototype)
-        console.log(Vue.prototype.__proto__ === Object.prototype)
-        console.log(school.__proto__.prototype === Vue.prototype );
-
+        }
+        function fn(e) {
+            console.log(e)
+        }
+        input.addEventListener('keyup', debounce(fn, 1000))
     </script>
 </body>
-
 </html>
