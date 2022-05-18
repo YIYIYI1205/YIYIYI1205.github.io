@@ -25,6 +25,136 @@
 5. `Array.prototype.isPrototypeOf(arr)`
 6. `Object.getPrototypeOf(arr) === Array.prototype`
 
+#### 方法
+
+- `Array.prototype.slice.call(arguments)`
+
+## 预编译
+
+- `js`运行三部曲：语法分析、预编译、解释执行
+  - 语法分析：引擎检查  代码有没有什么低级的语法错误
+  - 预编译：在内存中开辟一些空间，存放一些变量与函数，会导致变量提升
+  - 解释执行：执行代码
+- 浏览器先按照`js`的顺序加载`<script>`标签分隔的代码块，`js`代码块加载完毕之后，立刻进入到上面的三个阶段，然后再按照顺序找下一个代码块，再继续执行三个阶段，无论是外部脚本文件（不异步加载）还是内部脚本代码块，都是一样的，并且都在同一个全局作用域中
+- 预编译过程
+  - `GO（global object）`对象（`window`对象）(脚本代码块`script`执行前)
+    1. 生成`GO`对象` GO｛｝(global object) `这个`GO`就是`window`
+    2. 将全局的变量声明（的名）储存在`GO`对象中，`value`为`undefined`
+    3. 将全局的函数声明的函数名作为`GO`对象中的`key`，函数整体内容为`value`储存到`GO`对象中，如果遇到同名，直接覆盖
+    - 任何变量，如果变量未经声明就赋值，这些变量就为全局对象所有。一切声明的全局变量和未经声明的变量，全归`window`所有。
+  
+    ```tsx
+    var a
+    function fun() {}
+    function abc() {}
+    console.log('第1次', a)      // function a
+    function a() {}
+    console.log('第2次', a)      // function a
+    var a = 100 
+    console.log('第3次', a)      // 100
+    ```
+  
+  - `AO（action object）`对象
+    - 是函数执行前的一瞬间，生成一个`AO`对象（在函数执行前的一瞬间会生成自己的`AO`，如果函数执行`2`次，生成了两次`AO`，这两次的`AO`是没有任何关联）
+    1. 执行前的一瞬间，会生成一个`AO（action object）`对象
+    2. 分析参数，形参作为`AO`对象的属性名，实参作为`AO`对象的属性值
+    3. 分析`var`变量声明，变量名作为`AO`对象的属性名，值为`undefined`，如果遇到同名的，不去做任何改变
+    4. 分析函数声明，函数名作为`AO`对象的属性名，值为函数体，如果遇到同名的，直接覆盖（会将作为参数传进来的变量值覆盖）
+
+    ```jsx
+    console.log(person) // undefined
+    console.log(personFun) // function personFun
+    var person = "saucxs"
+    console.log(person) // saucxs
+    function personFun() {
+      console.log(person) // 这里只是输出person，并没有person = 进行赋值，所以不会定义在全局 
+      var person = "songEagle"; // 这里有定义person，所以变量提升，上面一个输出person并不会往外找
+      console.log(person)
+    }
+    personFun() // undefined songEagle
+    console.log(person) // saucxs
+    ```
+
+## this
+
+1. 默认绑定，默认为浏览器环境执行结果
+
+  ```jsx
+  function get(name){
+    console.log(name)
+  }
+  get(123)
+  get.call(window, 123)
+  ```
+
+2. 在非箭头函数下，`this`永远指向最后调用它的那个对象(隐式绑定)
+
+  ```javascript
+  var name = 222
+  var a = {
+    name: 111,
+    say: function() {
+      console.log(this.name)
+    }
+  }
+  var fun = a.say
+  fun() // fun.call(window) // 222
+  a.say() // a.say.call(a) // 111
+  var b = {
+    name: 333,
+    say: function(fun) {
+      fun() // fun.call(window) // 222
+    }
+  }
+  b.say(a.say) // 222
+  b.say = a.say
+  b.say() // b.say.call(b) // 333
+  ```
+
+3. 构造函数下，`this`与被创建的新对象绑定（`new`绑定）
+4. `DOM`事件，`this`指向触发事件的元素
+5. 内联事件分两种情况
+
+  ```html
+  <!-- DOM元素 -->
+  <button onclick="console.log(this)"></button>
+  <!-- window -->
+  <button onclick="(function(){console.log(this)})()"></button>
+  ```
+
+5. 箭头函数的`this`始终指向函数定义时外层代码块的`this`，而非执行时；箭头函数没有自己的`this`，不可以当做构造函数，不能使用`new`，不可以使用`arguments`
+
+  ```jsx
+  var obj = {
+    say: () => {
+      console.log(this) // window
+    }
+  }
+  var obj = {
+    birth: 1990,
+    getAge: function() {
+      var fn = () => this.birth // obj
+    }
+  }
+  ```
+
+6. `bind`，`call`，`apply`方法等（显式绑定）
+  - `fun.apply(thisArg, [argsArray])`，传数组
+  - `fun.call(thisArg[, arg1[, arg2[, ...]]])`，传参数
+  - `fun.bind(thisArg[, arg1[, arg2[, ...]]])`，传参数，并需要调用
+  ```jsx
+  // 手写call
+  Function.prototype.myCall = function(context) {
+    // this代表谁调用myCall方法
+    if(typeof this !== 'function'){
+      throw new Error('error')
+    }
+    context = context || window
+    const args = [...arguments].slice(1)
+    context.fn = this
+    const result = context.fn(...args)
+  }
+  ```
 ## 闭包
 
 ### 防抖、节流

@@ -237,40 +237,6 @@ const source = el.dataset.src;
 el.src = source;
 ```
 
-## this
-
-1. 默认绑定，默认为浏览器环境执行结果
-2. 在非箭头函数下，`this`永远指向最后调用它的那个对象(隐式绑定)
-
-  ```javascript
-  var o = { prop: 37 }
-  function independent() {
-    return this.prop
-  }
-  o.f = independent
-  console.log(o.f()) // 37
-  o.b = {
-    g: independent,
-    prop: 42
-  }
-  console.log(o.b.g()) // 42
-  ```
-
-2. 构造函数下，`this`与被创建的新对象绑定（`new`绑定）
-3. `DOM`事件，`this`指向触发事件的元素
-4. 内联事件分两种情况
-
-  ```html
-  <button onclick="console.log(this)"></button>    //DOM元素
-  <button onclick="(function(){console.log(this)})()"></button>  //window
-  ```
-
-5. 箭头函数的 this 始终指向函数定义时的`this`，而非执行时；箭头函数不可以当做构造函数，不能使用`new`，不可以使用`arguments`
-6. `bind`，`call`，`apply`方法等（显式绑定）
-   - `fun.apply(thisArg, [argsArray])`，传数组
-   - `fun.call(thisArg[, arg1[, arg2[, ...]]])`，传参数
-   - `fun.bind(thisArg[, arg1[, arg2[, ...]]])`，传参数，并需要调用
-
 ## new 的过程
 
 1. 创建一个空对象`obj`

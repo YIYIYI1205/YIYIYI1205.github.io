@@ -9,24 +9,14 @@
 <body>
     <input id="input" type="text">输入
     <script>
-        const input = document.getElementById('input')
-        function debounce(fn, delay){
-            let timer = null
-            return function() {
-                const context = this
-          
-                if (timer) {
-                    clearTimeout(timer)
-                }
-                timer = setTimeout(() => {
-                    fn.apply(context, arguments)
-                }, delay)
-            }
-        }
-        function fn(e) {
-            console.log(e)
-        }
-        input.addEventListener('keyup', debounce(fn, 1000))
+            var a = 1
+    function fun() {}
+    function abc() {}
+    console.log('第1次', a)      // function a
+    function a() {}
+    console.log('第2次', a)      // function a
+    var a = 100 
+    console.log('第3次', a)      // 100
     </script>
 </body>
 </html>
