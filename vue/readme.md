@@ -12,20 +12,6 @@
 ### 直接用`<script>`引入
 
 - 开发版本：包含完整的警告和调试模式
-- 直接在浏览器中可以拿到`$vm`对象，更改值，动态更新数据显示在页面上
-  
-  ```html
-  <div id="app">{{message}}</div>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></s>
-  <script>
-    const app = new Vue({
-      el: '#app',
-      data: {
-        message: 'abx'
-      }
-    })
-  </script>
-  ```
 
 ## 模板语法
 
@@ -34,7 +20,7 @@
 ### 插值
 
 - 可以在`{{}}`中写任何`Vue`实例`vm`上的属性以及`Vue`原型上的属性，例如`$options`、`Vue`原型上的`$emit`，`data`中的属性能够使用在插值中也是因为`data`中的属性在`Vue`实例`vm`上
-- `undefined`不显示，并且如果从对象中找一个不存在的属性也不会报错
+- `undefined`不显示，并且如果从对象中找一个不存在的属性也不会报错  
 
 ### 指令
 
@@ -275,8 +261,8 @@ computed: {
 
 ### 全局配置
 
-- `Vue.config`文件
-  - 阻止`vue`在启动时生成生产提示：`Vue.config.productionTip = false`
+- `Vue.config`对象更改全局配置（`Vue.config`文件）
+  - `productionTip`：阻止`vue`在启动时生成生产提示：`Vue.config.productionTip = false`
   - 添加按键别名：`Vue.config.keyCodes.huiche = 13`
 
 ### 全局API
@@ -296,8 +282,12 @@ computed: {
 
 ### 选项/数据
 
-- `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果写成箭头函数`this`是全局`window`；`$data`实现数据代理
+- `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果`Vue`所管理的函数写成箭头函数`this`是全局`window`；函数必须有返回值；`$data`实现数据代理
 - `vm.$watch('a.b.c', function (newVal, oldVal) {})`
+
+### 选项/DOM
+
+- `el: String | DOM`，提供一个在页面上已存在的`DOM`元素作为`Vue`实例的挂载目标，在实例挂载之后，元素可以用`vm.$el`访问；容器和`vue`实例之间一一对应
 
 ### 选项/生命周期钩子
 

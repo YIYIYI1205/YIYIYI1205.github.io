@@ -7,16 +7,15 @@
     <title>Document</title>
 </head>
 <body>
-    <input id="input" type="text">输入
+    <div id="app">{{message}}</div>
+    <script src="./vue.js"></script>
     <script>
-            var a = 1
-    function fun() {}
-    function abc() {}
-    console.log('第1次', a)      // function a
-    function a() {}
-    console.log('第2次', a)      // function a
-    var a = 100 
-    console.log('第3次', a)      // 100
+      const app = new Vue({
+        el: '#app',
+        data: {
+          message: 'abx'
+        }
+      })
     </script>
 </body>
 </html>
