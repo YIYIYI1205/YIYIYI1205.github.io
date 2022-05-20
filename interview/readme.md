@@ -587,107 +587,6 @@ function Fn() {
 const fn = newObj(Fn)
 ```
 
-### event loop
-
-- js是单线程
-- Javascript 有一个 main thread 主线程和 call-stack 调用栈(执行栈)，所有的任务都会被放到调用栈等待主线程执行。
-- JS调用栈采用的是后进先出的规则，当函数执行的时候，会被添加到栈的顶部，当执行栈执行完成后，就会从栈顶移出，直到栈内被清空。
-- 同步任务会在调用栈中按照顺序等待主线程依次执行，异步任务会在异步任务有了结果后，将注册的回调函数放入任务队列中等待主线程空闲的时候（调用栈被清空），被读取到栈内等待主线程的执行。
-- 同步任务——微任务（Process.nextTick（Node独有）、Promise、Object.observe(废弃)、MutationObserver）——宏任务（script全部代码、setTimeout、setInterval、setImmediate（浏览器暂时不支持，只有IE10支持，具体可见MDN）、I/O、UI Rendering）
-- setTimeout时间长的会比时间短的后执行
-
-```javascript
-console.log('start')
-setTimeout(() => {
-  console.log('timer1')
-  Promise.resolve().then(function() {
-    console.log('promise1')
-  })
-}, 0)
-setTimeout(() => {
-  console.log('timer2')
-  Promise.resolve().then(function() {
-    console.log('promise2')
-  })
-}, 0)
-Promise.resolve().then(function() {
-  console.log('promise3')
-})
-console.log('end')
-// start
-// end
-// promise3
-// timer1
-// promise1
-// timer2
-// promise2
-
-console.log('script start')
-
-setTimeout(() => {
-  console.log('time1')
-}, 1 * 2000)
-
-Promise.resolve()
-  .then(function () {
-    console.log('promise1') // 加入微任务第一个
-  })
-  .then(function () {
-    console.log('promise2')
-  })
-
-async function foo() {
-  await bar()
-  console.log('async1 end') // 加入微任务第二个
-}
-foo()
-
-async function errorFunc() {
-  try {
-    await Promise.reject('error!!!') // 加入微任务第三个
-  } catch (e) {
-    console.log(e)
-  }
-  console.log('async1')
-  return Promise.resolve('async1 success')
-}
-errorFunc().then((res) => console.log(res))
-
-function bar() {
-  console.log('async2 end')
-}
-
-console.log('script end')
-// script start
-// async2 end
-// script end
-// promise1
-// async1 end
-// error!!!
-// async1
-// promise2
-// async1 success
-// time1
-
-setTimeout(() => {
-  console.log(1)
-}, 0)
-
-const P = new Promise((resolve, reject) => {
-  console.log(2)
-  setTimeout(() => {
-      resolve()
-      console.log(3) // 同步方法，会先于后面的异步执行
-  }, 0)
-})
-
-P.then(() => {
-  console.log(4)
-})
-console.log(5)
-// 2 5 1 3 4
-```
-
 #### 56. 要求设计 LazyMan 类，实现以下功能
 
 ```javascript
@@ -1358,12 +1257,6 @@ function quickSort(arr) {
 - 观察者模式中主体和观察者是互相感知的，发布-订阅模式是借助第三方来实现 调度的，发布者和订阅者之间互不感知
 
 ## Node
-
-### 事件循环
-
-#### 说说浏览器和 Node 事件循环的区别
-
-- v11以上一样
 
 ## 浏览器、安全
 
