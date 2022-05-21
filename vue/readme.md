@@ -53,7 +53,7 @@ computed: {
     }
   }
   // 简写
-  fullName: function() {
+  fullName() {
     return this.firstName + '-' + this.lastName
   } 
 }
@@ -292,7 +292,9 @@ computed: {
 ### 选项/数据
 
 - `data: Object | Function`，组件必须用`function`，此处的`this`是`Vue`实例，如果`Vue`所管理的函数写成箭头函数`this`是全局`window`；函数必须有返回值；`$data`实现数据代理
-- `vm.$watch('a.b.c', function (newVal, oldVal) {})`
+- `computed`
+- `methods`
+- `watch`
 
 ### 选项/DOM
 
@@ -319,6 +321,10 @@ computed: {
   - `vm.$destroy()`调用时
   - `beforeDestroy`：`vm`中的所有`data`、`methods`、指令等等都处于可用状态，但是页面不会变化，马上要执行销毁过程，一般在此阶段：关闭定时器、取消订阅消息、解绑自定义事件等收尾操作
   - `destroyed`
+
+### 实例方法/数据
+
+- `watch`：`vm.$watch('a.b.c', function (newVal, oldVal) {})`
 
 ### 实例方法/生命周期
 
