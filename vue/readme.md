@@ -149,7 +149,7 @@ computed: {
 ### 表单输入绑定
 
 - `form`中的`Button`提交会刷新页面，在`form`中配置`@submit.prevent`
-- `v-model`修饰符
+- `v-model`修饰符，收集`value`
   - `v-model.number`
   - `v-model.lazy`，失去焦点的一瞬间收集数据
   - `v-model.trim`删除空格
@@ -277,9 +277,9 @@ computed: {
 ### 全局API
 
 - `Vue.extend(options)`：创建子类，`data`必须是函数，因为若`data`是对象，会出现指向同一个对象地址；不能写`el`
-- `Vue.set(target, propertyName/index, value)`
+- `Vue.set(target, propertyName/index, value)`适用于两个场景：添加某个不存在的属性、直接修改数组的某个索引
   - 当一个对象中不存在某个属性，直接用`vue._ data.name`设置的数据，无法数据代理到`vm`身上，因为直接赋值没有数据代理的`set`和`get`方法
-  - 应该使用`Vue.set(vm.student, 'set', '男'`添加新的属性，使用`vm.$set`是同样的
+  - 应该使用`Vue.set(this.student, 'sex', '男'`添加新的属性，使用`vm.$set`是同样的
   - 不能直接给`vm._data`追加，必须给里面具体的属性追加属性
   - 数组上并不存在关于`arr[0]`的`set`和`get`，因此直接修改`vm.arr[0] = {}`是无法让页面有响应的，需要`vm.$set(this.arr, 0, {})`
   - 数组修改自身的方法`push|pop|shift|unshift|splice|sort|reverse`，是不需要使用`set`就可以响应到页面的，这些方法被`vue`包裹，因此页面可以响应引起视图更新
@@ -333,7 +333,7 @@ computed: {
 
 ### 指令
 
-- `v-text`等价于差值语法
+- `v-text`等价于差值语法 
 - `v-html`，容易导致`xss`攻击，可以给`cookie`设置`HttpOnly`，就不可以通过`js`脚本的`document.cookie`获取了
 - `v-pre`：可以用它跳过没有使用指令语法、插值语法的节点，会加快编译
 - `v-cloak`：网速过慢时，配合`css`实现脚本还未加载时插值语句不显示`[v-cloak]{display: none}`，`vue`请求回来执行时会将元素上的`v-cloak`删除
@@ -383,8 +383,8 @@ computed: {
 - `vue`会检测`data`中所有层次的数据
 - 数据代理中的`set`方法中有一个重新解析页面的响应式`reactiveSetter`，能够实现对对象属性的监视
 - 通过`setter`实现数据的监测，且要在`new Vue`时就传入监测的数据
-  - 对象中后追加的属性，`vue`默认不做响应式处理
-  - 如需给后追加的属性做响应式，会用`Vue.set()`或`vm.$set()`
+  - 对象中后追加的属性，`vue`默认不做响应式处理，因为追加的属性没有响应式，没有`get`和`set`方法
+  - 如需给后追加的属性做响应式，会用`Vue.set(target, key, val)`或`vm.$set()`
 - 监测数组中的数据：通过包裹数组更新元素的方法实现
   - 调用原生对应的方法对数组进行更新
   - 重新解析模板，进而更新页面
@@ -406,18 +406,20 @@ const data = {
   address: 'yyy'
 }
 const vm = {}
-const obs = new Observer(data)
+const obs = new Observer(data) // 数据监测
 console.log(obs)
 vm._data = data = obs // 没有将data直接代理到vm身上
 console.log(vm)
 function Observer(obj) {
   const keys = Object.keys(obj)
   keys.forEach((k) => { // 只考虑了一层数据，需要用递归实现
+    // this是Observer的实例对象
     Object.defineProperty(this, k, { 
       get() {
         return obj[k]
       },
       set(val) {
+        // 在这里解析模板、生成虚拟DOM、Diff比较..
         obj[k] = val
       }
     })
