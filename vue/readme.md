@@ -99,6 +99,8 @@ watch{
 - `:class=[a,b,c]`还可以传入数组
 - `:class={a: true, b: false}`还可以传入对象
 - 用`:style="{fontSize: fsize + 'px'}"`的形式绑定`style`
+- 组件的样式汇总在一起会造成类名冲突，这时候可以在组件中加`scoped`，`app`组件不适合用`scoped`
+- 使用`less`，`<style lang='less'>`，脚手架需要安装`less-loader`和`less`
 
 ## 条件渲染
 
@@ -193,21 +195,32 @@ computed: {
 - 组件：实现应用中局部功能代码和资源的集合
 - 模块化：对于`js`文件
 - 非单文件组件
-  - 用`Vue.extend`定义子组件
-  - `data`用函数的形式
-  - 不能写`el`配置项，因为所有组件都要被一个`vm`管理
-  - 在`new Vue`中配合子组件`components: {子组件}`注册局部组件
-  - `Vue.component('hello', hello)`注册全局组件
-  - 可配置`name`参数指定组件在开发者工具中的名称
-  - 非脚手架环境下有大写、自闭合组件`bug`
-  - 可简写为`const school = options`
+  - 第一步：用`Vue.extend`定义子组件
+    - `data`用函数的形式，因为如果用对象，在多个地方使用组件时，`data`数据会被共用，需要函数返回才能区别数据
+    - 不能写`el`配置项，因为所有组件都要被一个`vm`管理
+  - 第二步：注册组件
+    - 在`new Vue`中配置子组件`components: {子组件}`注册局部组件
+    - `Vue.component('组件名', 组件)`注册全局组件
+    - 可配置`name`参数指定组件在开发者工具中的名称
+    - 非脚手架环境下有首字母大写、自闭合组件`bug`；一般多个单词使用小写加`-`或者首字母大写方式，一个单词首字母大写或小写都行
+    - 可将`const school = vue.extend(options)`简写为`const school = options`
   - `VueComponent`
     - 每一个组件本质上是一个`VueComponent`构造函数，是由`Vue.extend`生成的，`school = Vue.extend`，`school`拥有`prototype`，是一个`VueComponent`构造函数
-    - 在使用组件时，`Vue`在解析时执行`new VueComponent(options)`创建组件的实例对象
+    - 只要使用组件，`Vue`就会在解析时执行`new VueComponent(options)`创建组件的实例对象
     - 每次调用`Vue.extend`，返回的都是一个新的`VueComponent`，每一次`Vue.extend`都会返回一个新定义的`function VueComponent`
     - `this`指向：`new Vue`配置中，`this`指向`Vue`实例对象(`vm`)；组件配置中，`this`指向`VueComponent`实例对象(`vc`)；`vm`的`$children`中包含`vc`
+    - `VueComponent`是可复用的`Vue`实例，接收相同的选项，但是`data`必须返回函数，不能配置`el`选项
     - 内置关系：`VueComponent.prototype.__proto__ === Vue.prototype`，让`vc`可以访问到`vue`原型上的属性、方法
 - 单文件组件：定义组件：`export default {name: ''}`，`Vue.extend`可以省略；入口`app.vue`，引入组件；在`main.js`创建`vm`，引入`app组件`；在`index.html`中引入`main.js`
+
+### Prop
+
+- 接受父组件传参：`props:['name', 'sex', 'age']`
+- 传`number`类型时可以用`v-bind`进行传递`:age='18'`
+- 接收时限制类型：`props:{name: String, age: Number}`，或者`props:{name: {type: String, require: true}}`还可以配置默认值`default`
+- 不要在子组件中修改传递过来的参数
+- 在`data`中配置新的属性：`myAge: this.age`，可以更改外部数据`this.myAge++`
+- 无法传递`key`、`red`参数
 
 ## 可复用性 & 组合
 
@@ -215,7 +228,7 @@ computed: {
 
 - 配置项：`directives`，生命周期：`bind | inserted | update`，参数：`element | binding`
 - 普通函数：`bing + update`，调用：1. 指令与元素成功绑定时会被调用；2. 指令所在的模板被重新解析时会被调用（不是所依赖的数据变化时才变）
-- 指令名：`big-number`，不要用驼峰式
+- 指令名：`big-number`，不要用驼峰式，使用`v-big-number`
 - `this`指向`window`，如果指向`vm`就不需要`element`了
 - 全局指令：`Vue.directive`
 
@@ -258,6 +271,24 @@ computed: {
 </script>
 ```
 
+### 插件
+
+- 通过全局方法`Vue.use()`使用插件。需要在调用`new Vue()`启动应用之前完成
+- 注册插件：含有`install`方法的对象，接收`Vue`作为第一个参数，第二个参数时插件使用者传递的数据
+  
+  ```javascript
+  export default{ 
+    install(Vue) {
+      // 全局过滤器
+      Vue.filter()
+      // 全局自定义指令
+      Vue.directive()
+      // 定义混入
+      Vue.mixin()
+    }
+  }
+  ```
+
 ### 过滤器
 
 - 使用：`数据 | 过滤器(传参)`
@@ -270,7 +301,7 @@ computed: {
 
 ### 全局配置
 
-- `Vue.config`对象更改全局配置（`Vue.config`文件）
+- `Vue.config`对象更改全局配置，与`vue.config.js`无关
   - `productionTip`：阻止`vue`在启动时生成生产提示：`Vue.config.productionTip = false`
   - `keyCodes`：添加按键别名，`Vue.config.keyCodes.huiche = 13`
 
@@ -288,6 +319,7 @@ computed: {
 - `Vue.directive(id, [definition])`：注册或获取全局指令
 - `Vue.filter(id, [definition])`：注册或获取全局过滤器
 - `Vue.component(id, [definition])`：注册或获取全局组件
+- `Vue.mixin(mixin)`：全局注册一个混入，影响注册之后所有创建的每个`Vue`实例
 
 ### 选项/数据
 
@@ -299,9 +331,11 @@ computed: {
 ### 选项/DOM
 
 - `el: String | DOM`，提供一个在页面上已存在的`DOM`元素作为`Vue`实例的挂载目标，在实例挂载之后，元素可以用`vm.$el`访问；容器和`vue`实例之间一一对应
+- `render(createElement)`：该渲染函数接收一个`createElement`方法作为第一个参数用来创建`VNode`，为了解决`vue`版本没有`template`编译器，`render`返回`createElement(组件)`指定具体内容
 
 ### 选项/生命周期钩子
 
+- `this`指向`vm`或组件实例对象
 - 初始化过程：
   - `new Vue()`
   - 初始化：生命周期、事件，但数据代理还未开始
@@ -315,12 +349,16 @@ computed: {
   - `mounted`：页面呈现的是经过`Vue`编译的`dom`结构，所有对`dom`的操作有效（尽可能避免）。此时初始化过程结束，一般在此进行：开启定时器、发送网络请求、订阅消息、绑定自定义事件等初始化操作
 - 更新流程，当数据改变时：
   - `beforeUpdate`：数据是新的，页面还是旧的
-  - 根据新数据，生成新的虚拟`dom`，与旧的虚拟`dom`进行比较，最红完成页面更新
+  - 根据新数据，生成新的虚拟`dom`，与旧的虚拟`dom`进行比较，最终完成页面更新
   - `updated`：数据和页面保持同步
 - 销毁流程：
   - `vm.$destroy()`调用时
   - `beforeDestroy`：`vm`中的所有`data`、`methods`、指令等等都处于可用状态，但是页面不会变化，马上要执行销毁过程，一般在此阶段：关闭定时器、取消订阅消息、解绑自定义事件等收尾操作
   - `destroyed`
+
+### 选项/组合
+
+- `mixin`：两个组件共享一个配置项，使用：`mixins: []`，任何配置都可以进行混合，`data`以及`methods`冲突时以组件为主，生命周期冲突时不以任何为主，两个方法都要调用，`mixins`的先调用
 
 ### 实例方法/数据
 
@@ -334,10 +372,14 @@ computed: {
 ### 指令
 
 - `v-text`等价于差值语法 
-- `v-html`，容易导致`xss`攻击，可以给`cookie`设置`HttpOnly`，就不可以通过`js`脚本的`document.cookie`获取了
+- `v-html`，容易导致`xss`攻击，可以给`cookie`设置`HttpOnly`，就不可以通过`js`脚本的`document.cookie`获取了，不要在表单上使用
 - `v-pre`：可以用它跳过没有使用指令语法、插值语法的节点，会加快编译
 - `v-cloak`：网速过慢时，配合`css`实现脚本还未加载时插值语句不显示`[v-cloak]{display: none}`，`vue`请求回来执行时会将元素上的`v-cloak`删除
 - `v-once`：只渲染元素和组件一次，初次动态渲染后就变成静态资源了
+
+### 特殊 attribute
+
+- `ref`：给元素或子组件绑定`ref`属性，可以通过`this.$refs`获取；在组件上添加`ref`，获取的是组件`VueComponent`，而用原生`getElementById`获取是组件最外层的`DOM`元素
 
 ## 原理
 
@@ -436,9 +478,21 @@ function Observer(obj) {
 
 - `prototype`显式原型属性，函数才有，实例没有
 - `__proto__`隐式原型属性，函数和实例都有
-- 两者都是执行原型对象`Demo.prototype === prototype.__proto__`
+- 两者都指向原型对象`Demo.prototype === d.__proto__`
 - 通过显式原型属性操作原型对象：`Demo.prototype.x`，通过隐式原型属性获取对象属性
 - 内置关系：`VueComponent.prototype.__proto__ === Vue.prototype`，让`vc`可以访问到`vue`原型上的属性、方法
 
 ## 脚手架
 
+- 显示`webpack`相关配置：`vue inspect > output.js`，更改在配置参考中查看，在`vue.config.js`中修改，与`Vue.config`无关
+
+```html
+  <!-- 针对IE浏览器的一个特殊配置，含义是让IE浏览器以最高的渲染级别渲染页面 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- 开启移动端的理想视口 -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <!-- <%= BASE_URL %>表示public所在路径 -->
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <!-- package.json中的name成为title，webpack进行配置 -->
+  <title><%= htmlWebpackPlugin.options.title %></title>
+```
