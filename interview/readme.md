@@ -138,7 +138,7 @@ store.dispatch(actions.increase()) // {count: 3}
 
 ### Array、String 基础
 
-- Array.prototype.reduce((previousValue, currentValue, currentIndex, array), initialValue)
+- `Array.prototype.reduce((previousValue, currentValue, currentIndex, array), initialValue)`，第一个参数回调函数，里面传之前的返回值和现在的`value`，第二个参数时初始值
 
 #### 72. 为什么普通 for 循环的性能远远高于 forEach 的性能，请解释其中的原因
 

@@ -25,7 +25,7 @@
 ### 指令
 
 - 属性绑定动态值：`v-bind:属性='变量'`或`:属性 ='变量'`，单向数据绑定
-- 双向数据绑定：`v-model`，只能应用到有`value`的表单类元素上
+- 双向数据绑定：`v-model`，只能应用到有`value`的表单类元素上，可以使用`v-model`代替`checkbox`的`:checked`和`@change`，但是这样会报错，而且提示要加`sync`
 
 ## 计算属性和侦听器
 
@@ -36,6 +36,7 @@
 - 计算属性定义形式是方法，通过属性进行计算，以属性的形式绑定在`vm`上，属性改变，计算属性随之改变
 - 底层也是`Object.definedProperty`
 - `vm._data`并不存在计算属性
+- 计算属性也可以根据计算属性进行计算
 
 ```javascript
 computed: {
@@ -221,6 +222,18 @@ computed: {
 - 不要在子组件中修改传递过来的参数
 - 在`data`中配置新的属性：`myAge: this.age`，可以更改外部数据`this.myAge++`
 - 无法传递`key`、`red`参数
+
+### 自定义事件
+
+- 内置事件是给标签使用，而自定义事件是给组件使用
+- 自定义事件：`$emit`
+- 使用组件：`@自定义名称='方法'`(仍然可以在后面加`.once`等事件修饰符)或者用`ref`然后在`mounted`中`this.refs.名称.$on(自定义名称)`绑定自定义事件，第二种方法适合延时需求时使用，还可以配合`$once`只绑定一次事件
+- 组件内部：`this.$emit(自定义名称，参数)`
+
+### 传参
+
+- 给子组件传方法，在子组件中执行方法，传递参数
+- 自定义事件，两种写法
 
 ## 可复用性 & 组合
 
@@ -496,3 +509,23 @@ function Observer(obj) {
   <!-- package.json中的name成为title，webpack进行配置 -->
   <title><%= htmlWebpackPlugin.options.title %></title>
 ```
+
+## 问题
+
+- 方法跟进不去
+
+## 总结
+
+- `forEach`可以直接改变数组的值
+
+  ```jsx
+  this.list.forEach((value) => {
+    if (value.id === id) {
+      value.checked = !value.checked
+    }
+  });
+  ```
+
+- 给数组重新赋值，如果里面某些元素`key`不改变，并不会影响效率
+- `input-checked`，使用`:checked`来绑定计算属性，配合`@change`改变值；或者`v-model`配合计算属性`getter`和`setter`
+- 如果想将数组同步给`localStorage`，可以在监视器中做这一步，并且可能需要开启`deep`
