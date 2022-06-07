@@ -184,7 +184,7 @@ computed: {
   - 上：`.up`
   - 下：`.down`
   - 左：`.left`
-  - right：`.right`
+  - `right`：`.right`
   - 除此之外的遵循单词小写，连词中间用'-'，如`.caps-lock`
   - 系统修饰键`ctrl | alt | shift | meta`，在使用`@keyup`时，要配合按下其它键，释放其它键时才回触发；使用`@keydown`正常触发；
   - `@keyup.ctrl.y`
@@ -227,13 +227,86 @@ computed: {
 
 - 内置事件是给标签使用，而自定义事件是给组件使用
 - 自定义事件：`$emit`
-- 使用组件：`@自定义名称='方法'`(仍然可以在后面加`.once`等事件修饰符)或者用`ref`然后在`mounted`中`this.refs.名称.$on(自定义名称)`绑定自定义事件，第二种方法适合延时需求时使用，还可以配合`$once`只绑定一次事件
+- 使用组件：`@自定义名称='方法'`(仍然可以在后面加`.once`等事件修饰符)或者用`ref`然后在`mounted`中`this.refs.名称.$on(自定义名称)`绑定自定义事件，第二种方法适合延需求时使用，还可以配合`$once`只绑定一次事件
 - 组件内部：`this.$emit(自定义名称，参数)`
+- 解绑：解绑一个自定义事件`this.$off(自定义名称)`，解绑多个自定义事件`this.$off([自定义名称1, 自定义名称2])`，解绑全部自定义事件`this.$off()`
+- 销毁组件，自定义事件也全不奏效，原生事件不受影响
+- 使用`ref`，在`$on`中传递回调函数，直接写`this`指向的是绑定`ref`的`vc`而不是当前组件，需要传递`methods`中定义的方法作为回调函数或者使用箭头函数作为回调函数，`this`指向当前组件
+- 如果直接给组件绑定原生事件`@click`，组件会认为是自定义事件，`@click.native`才可以绑定原生事件
+- 绑定自定义事件的组件，才可以触发该自定义事件，无法在组件1中绑定自定义事件，组件2中触发该自定义事件
+- 全局事件总线
+  1. 所有组件都能看到`$bus`组件：给`vue`的原型对象添加组件`$bus`
+  2. `$bus`可以调用`$on`、`$off`、`$emit`，这三个方法都在`vue`的原型对象上
+  - 在组件销毁前，将事件进行解绑`beforeDestroy(){this.$bus.$off('事件')}`
+
+  ```javascript
+  // main.js
+  // 最初版本
+  const Demo = Vue.extend({})
+  const d = new Demo()
+  Vue.prototype.$bus = d
+  // 最终版本
+  const vm = new Vue({
+    el: 'app',
+    render: h => h(App),
+    beforeCreate() {
+      Vue.prototype.$bus = this // 安装全局事件总线
+    }
+  })
+  const Demo = Vue.extend({})
+  const d = new Demo()
+  Vue.prototype.x = d
+  // A.vue：传参
+  methods:{
+    sendStudentName() {
+      this.$bus.$emit('hello', this.name)
+    }
+  }
+  // B.vue：接收参数
+  mounted() {
+    this.$bus.$on('hello', data => {
+      console.log(data)
+    })
+  }
+
+  ```
+
+### 消息订阅与发布
+
+1. 订阅消息
+2. 发布消息
+
+```javascript
+// pubsub-js
+// A.vue：订阅消息组件
+import pubsub from 'pubsub-js'
+export default{
+  mounted() {
+    this.pubId = pubsub.subscribe('hello', (eventName, data) => {})
+  },
+  beforeDestroy() {
+    pubsub.unsubscribe(this.pubId)
+  }
+}
+// B.vue：发布消息组件
+import pubsub from 'pubsub-js'
+export default{
+  methods: {
+    sendStudentName() {
+      pubsub.publish('hello', this.name)
+    }
+  }
+}
+```
 
 ### 传参
 
-- 给子组件传方法，在子组件中执行方法，传递参数
-- 自定义事件，两种写法
+- 子组件给父组件
+  1. 给子组件传方法，在子组件中执行方法，传递参数
+  2. 自定义事件，两种写法
+- 任意组件
+  1. 全局事件总线
+  2. 消息订阅与发布，和全局事件总线一样，但是要引入新的库，并且看不到事件
 
 ## 可复用性 & 组合
 
@@ -321,6 +394,7 @@ computed: {
 ### 全局API
 
 - `Vue.extend(options)`：创建子类，`data`必须是函数，因为若`data`是对象，会出现指向同一个对象地址；不能写`el`
+- `Vue.nextTick([callback, context])`：在下次`DOM`更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的`DOM`，和`setTimeout`效果一样
 - `Vue.set(target, propertyName/index, value)`适用于两个场景：添加某个不存在的属性、直接修改数组的某个索引
   - 当一个对象中不存在某个属性，直接用`vue._ data.name`设置的数据，无法数据代理到`vm`身上，因为直接赋值没有数据代理的`set`和`get`方法
   - 应该使用`Vue.set(this.student, 'sex', '男'`添加新的属性，使用`vm.$set`是同样的
@@ -392,7 +466,74 @@ computed: {
 
 ### 特殊 attribute
 
-- `ref`：给元素或子组件绑定`ref`属性，可以通过`this.$refs`获取；在组件上添加`ref`，获取的是组件`VueComponent`，而用原生`getElementById`获取是组件最外层的`DOM`元素
+- `ref`：给元素或子组件绑定`ref`属性，可以通过`this.$refs`获取；在组件上添加`ref`，获取的是组件`VueComponent`，而用原生`getElementById`获取是组件最外层的`DOM`元素；可以用来获取焦点`this.ref.名字.focus()`
+
+### 内置的组件
+
+- `transition`
+  - 元素作为单个元素/组件的过渡效果。`<transition>`只会把过渡效果应用到其包裹的内容上，而不会额外渲染`DOM`元素，也不会出现在可被检查的组件层级中。只能使用在单独的元素上
+  - `name - string`，用于自动生成`CSS`过渡类名。例如：`name: 'fade'`将自动拓展为 `.fade-enter`，`.fade-enter-active` 等。默认类名为`"v"`
+  - `appear - boolean`，是否在初始渲染时使用过渡。默认为`false`
+  - 类名`v-enter`进入的起点、`v-enter-to`进入的终点、`v-leave-active`进入过程中
+  
+  ```html
+  <transition name='hello'>
+    <h1>12</h1>
+  </transition>
+  <style>
+  h1{
+    transition: 0.5s linear;
+  }
+  /* 或者 */
+  .hello-enter-active, .hello-leave-active{
+    transition: 0.5s linear;
+  }
+  .hello-enter, .hello-leave-to{
+    transform: translateX(-100%);
+  }
+  .hello-enter-to, .hello-leave{
+    transform: translateX(0);
+  }
+  </style>
+  ```
+
+  - 配合第三方库`npm install animate.css`
+  - 引入`import 'animate.css'`
+  - 类名配置在`transition`的`name`：`name='animate_animated animate_bounce'`
+  - 配置类动画：`enter-active-class='animate__swing'`
+- `transition-group`，每个元素必须有`key`值
+
+## 请求数据
+
+- 解决跨域
+  - `cors`后端配置
+  - `jsonp`后端前端配置
+  - `proxy`：代理服务器与前端服务器在同一个端口
+    - `nginx`开启
+    - `vue-cli`开启：`vue-cli`的`devServer.proxy`
+
+      ```javascript
+      module.exports = {
+        // 方式一：不能指定是否必须转发，不能配置多个代理
+        devServer: {
+          proxy: 'http://localhost:4000' // 只需要写到端口号，当8080原本请求就存在，就不会做转发
+        }
+        // 方法二：
+        devServer: {
+          proxy: {
+            '/api': { // 请求前缀，在请求时放在端口号之后的
+              target: 'http://localhost:4000',
+              pathRewrite: {'^/api': ''}, // 请求将api删了
+              ws: true,
+              changeOrigin: true // 用于控制请求头中host值 
+            },
+            '/foo': {
+              target: 'http://localhost:4001',
+            }
+          }
+        }
+      }
+      ```
 
 ## 原理
 
@@ -529,3 +670,4 @@ function Observer(obj) {
 - 给数组重新赋值，如果里面某些元素`key`不改变，并不会影响效率
 - `input-checked`，使用`:checked`来绑定计算属性，配合`@change`改变值；或者`v-model`配合计算属性`getter`和`setter`
 - 如果想将数组同步给`localStorage`，可以在监视器中做这一步，并且可能需要开启`deep`
+- 引入第三方资源`css`字体缺少引入，直接在`public`中引入`css`，并在`index.html`中引入，而不是在`vue`中引入
