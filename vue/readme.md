@@ -304,6 +304,7 @@ export default{
 - 子组件给父组件
   1. 给子组件传方法，在子组件中执行方法，传递参数
   2. 自定义事件，两种写法
+  3. 作用域插槽
 - 任意组件
   1. 全局事件总线
   2. 消息订阅与发布，和全局事件总线一样，但是要引入新的库，并且看不到事件
@@ -467,6 +468,10 @@ export default{
 ### 特殊 attribute
 
 - `ref`：给元素或子组件绑定`ref`属性，可以通过`this.$refs`获取；在组件上添加`ref`，获取的是组件`VueComponent`，而用原生`getElementById`获取是组件最外层的`DOM`元素；可以用来获取焦点`this.ref.名字.focus()`
+- `slot`：插槽，类似`react`的`this.props.children`，将组件使用时包裹的元素放在组件内写`<slot></slot>`的地方
+  - 还可以传递默认值`<slot>默认值</slot>`
+  - 具名插槽：适用于多个插槽，在使用组件时配置`slot`参数，`<组件><header slot='header'>123</header></组件>`，在组件内部配置`name`参数，`<slot name='header'>默认值</slot>`，可以写多个，用`template`包裹即可，此时可以用`v-slot:header`；可以写成`v-slot:header`或者`slot='header'`
+  - 作用域插槽：可以在插槽中把数据传给外部的元素`<slot :data='data'>`，外部必须在组件里包裹`<template slot-scope=''>`：`<组件><template slot-scope='data'>{{data}}</template></组件>`，其中`data`就是传过来的数据；`slot-scope`是新`API`，旧的是`scope`；作用域插槽也可以使用具名
 
 ### 内置的组件
 
@@ -510,7 +515,7 @@ export default{
   - `jsonp`后端前端配置
   - `proxy`：代理服务器与前端服务器在同一个端口
     - `nginx`开启
-    - `vue-cli`开启：`vue-cli`的`devServer.proxy`
+    - `vue-cli`开启：`vue-cli`的`devServer.proxy`，在`vue.config.js`
 
       ```javascript
       module.exports = {
@@ -534,6 +539,8 @@ export default{
         }
       }
       ```
+
+- `vue-resource`：插件，`vue.use(vueResource)`，`vm`上多了`$http `
 
 ## 原理
 
@@ -639,6 +646,13 @@ function Observer(obj) {
 ## 脚手架
 
 - 显示`webpack`相关配置：`vue inspect > output.js`，更改在配置参考中查看，在`vue.config.js`中修改，与`Vue.config`无关
+- 在`vue.config.js`中配置
+  
+  ```javascript
+  module.exports = {
+    lintOnSave: false // 关闭语法检查
+  }
+  ```
 
 ```html
   <!-- 针对IE浏览器的一个特殊配置，含义是让IE浏览器以最高的渲染级别渲染页面 -->
@@ -671,3 +685,286 @@ function Observer(obj) {
 - `input-checked`，使用`:checked`来绑定计算属性，配合`@change`改变值；或者`v-model`配合计算属性`getter`和`setter`
 - 如果想将数组同步给`localStorage`，可以在监视器中做这一步，并且可能需要开启`deep`
 - 引入第三方资源`css`字体缺少引入，直接在`public`中引入`css`，并在`index.html`中引入，而不是在`vue`中引入
+- `import`语句会优先执行
+
+## vuex
+
+- 专门在`vue`中实现集中式状态（数据）管理的一个`vue`插件
+
+### 配置项
+
+- 三个部分，由`store`管理，提供`dispatch`、`commit`方法
+  - `actions`：组件中`dispatch()`给`actions`，`actions`是一个对象，其中一定含有`key`值和`dispatch`第一个参数相同，`value`为一个函数；`actions`可以做请求
+  - `mutations`：调用`commit()`给`mutations`，`mutations`是一个对象，其中一定含有`key`值和`commit`第一个参数相同，`value`为一个函数，函数可以拿到`state`和数据的数值，执行具体更改数据的表达式，例如`state.sum+=2`；`vue`允许不走`actions`直接`commit()`
+  - `state`对象保管数据，`state`可以帮助重新渲染组件
+- `vuex4`只能用在`vue3`中，`vuex3`只能用在`vue2`中
+- 开发者工具是监控`mutations`状态，因此不要在`actions`中直接对`state`进行改变
+- 一般在`actions`中写业务逻辑而不是组件中，因为各组件调用`actions`中方法，只需要写一套
+- `getters`：加工`state`中的内容，类似`data`和`computed`的关系
+
+### 方法
+
+- `mapState`和`mapGetters`用于生成计算属性`methods(){sum(){return this.$store.state.sum}}`；这两个方法中的参数可以传对象或数组
+- `mapActions`和`mapMutations`用于生成调用`dispatch`和`commit`的方法，注意调用`method`方法的时候需要传参，否则会传`event`；这两个方法中的参数可以传对象或数组
+
+### 模块化
+
+- 创建模块对象，里面分别写入各自的`actions`、 `mutations`、 `state`、 `getters`，其中对应的参数`state`也是该模块下的`state`，导出时通过`export default new Vuex.Store({ modules: {对应的模块} })`
+- 使用时需要加上对应模块`this.$store.state.模块`
+- `mapState(模块, [对应模块的数据])`第一个参数传模块名，必须在`store`中配置了模块名`namespaced: true`，`mapGetter`同理
+- `mapMutations(模块，[对应mutations的key])`，`mapActions`同理
+- 如果想直接操作`commit`，需要用`this.$store.commit('模块/对应actions的key', value)`
+- `this.$store.getters`无法拿到对应模块，必须是`this.$store.getters[模块/getters的key]`
+
+```javascript
+
+// main.js
+import store from './store'
+new Vue({
+  el: '#app',
+  render: h => h(App),
+  store
+})
+
+// store/index.js  用于创建vuex中的store
+import Vue from 'Vue'
+import Vuex from 'vuex'
+Vue.use(Vuex)  // use之后，就可以创建vm的时候传入配置项store，放在这是因为mian.js需要引入store，加载会有问题
+
+// actions用于响应组件中的动作
+const actions = {
+  jia: function(context , value) {
+    context.commit('JIA', value)
+  },
+  jiaOdd(context, value) {
+    console.log('可以在这里处理很多逻辑')
+    // 可以调用另一个action中的回调
+    context.dispatch('demo', value)
+  },
+  damo(context, value) {
+    console.log('继续处理逻辑')
+    context.dispatch('JIA',value)
+  }
+}
+// mutations用于操作数据
+const mutations = {
+  JIA(state, value) {
+    state.sum += value
+  },
+  JIAN(state, value) {
+    state.sum -= value
+  }
+}
+// state用于存储数据
+const state = {
+  sum: 0
+}
+// getters用于将state中的数据进行加工
+const getters = {
+  bigSum(state){
+    return state.sum * 10
+  }
+}
+export default new Vuex.Store({
+  actions,
+  mutations,
+  state,
+  getters
+})
+
+// 模块化写法
+const countOptions = {
+  namespaced: true,
+  actions: {},
+  mutations: {},
+  state: {},
+  getters: {}
+}
+const personOptions = {
+  namespaced: true,
+  actions: {},
+  mutations: {},
+  state: {},
+  getters: {}
+}
+export default new Vuex.Store({
+  modules: {
+    countOptions,
+    personOptions
+  }
+})
+
+// Count.vue 组件
+<template>
+  <div>{{sum}}</div>
+  <div>{{$store.getters.bigSum}}</div>
+</template>
+<script>
+import {mapState, mapGetter, mapActions, mapMutations} from 'vuex'
+export default {
+  methods: {
+    increment() {
+      this.$store.dispatch('jia', this.n)
+    },
+    decrement() {
+      this.$store.commit('JIAN', this.n) // 没有业务逻辑就直接走mutation
+    },
+    // 下面的写法调用方法的时候需要传参
+    ...mapActions({
+      increment: 'jia'
+    }),
+    ...mapMutations(['JIAN']) // 当方法名和Mutations中名字对应，可以传递数组简写
+  },
+  computed() {
+    ...mapState({
+      sum: 'sum',
+      school: 'school'
+    }),
+    // 简写：
+    ...mapState(['sum', 'school'])
+    ...mapGetters(['bigSum'])
+  }
+}
+</script>
+```
+
+## 路由
+
+- 路由`route`，路由器`router`，多个路由，需要经过路由器的管理
+- 为了实现`SPA`单页面应用：部署到后端只有`index.html`，所以路由点击跳转没问题，一旦跳转后刷新页面就会`404`，需要使用`hash`
+- 浏览器路径变化后，`vue-router`检测到，展示对应的组件
+- 前端路由：返回组件；后端路由：返回函数
+- `vue-router4`只能在`vue3`中使用，`vue-router3`才能在`vue2`中使用，是`vue`的插件，所以要用`vue.use(VueRouter)`
+
+### 使用
+
+- 配置`router`：`new VueRouter({})`
+  - `mode`：`history | hash`
+  - `routes`：路由数组
+    - `path`：跳转路径
+    - `component`：展示组件
+    - `children`：子路由
+    - `name`：路由命名，用于`<router-link>`中`to`跳转，简化复杂`path`，`to`必须带`name`跳转
+    - `props`
+      - 对象：该对象中的所有值都以`props`的形式传给组件，需要在组件中配置`props: ['key']`；用得较少，传递固定数据
+      - 布尔值：若`true`，则所有`params`以`props`的形式传递给组件
+      - 函数：`function($route) { return { id: $route.query.id } }`简写`props({query: {id, title}}){ return {id, title}}`
+    - `meta`：路由元信息，可以配置任意参数
+    - `beforeEnter`：独享路由守卫
+- 跳转使用`router-link`标签，`<router-link to='/about'>About</router-link>`，可以使用配置激活样式`active-class`
+  - `to`可以写字符串或者对象，包含`path`、`query`、`name`
+- 指定显示位置`<router-view />`
+- 切换路由，组件会被销毁
+- 每个路由的`this.$route`不同，`this.$router`相同
+- 嵌套路由：配置`children`，二级路由的`path`不加`/`
+
+### 传参
+
+1. `query`参数：通过`this.$route.query`获取参数或者在路由中配置`props({query; {id. title}}){ return {id, title}}`
+2. `params`参数：使用`params`不能用`path`作为`to`的传参，必须用`name`
+    - 传参：可以直接在`path`后用`/`拼接参数`/detail/123/456`
+    - 配置：在`router.js`中配置`path: '/detail/:id/:name'`
+    - 获取：`this.$route.params`或者在路由中配置`props: true`，可以用`props: []`接收
+
+### 历史模式
+
+- `push`模式，往堆栈里添加，默认
+- `replace`模式，替换，给`<router-link replace>`加`replace`就开启了
+
+### 跳转
+
+1. `<router-link>`
+2. `this.$router.push()`传参和`to`一样；`replace`类似
+3. 回退`this.$router.back()`或`go`负数、
+4. 前进`this.$router.forward()`或`go`正数
+
+### 缓存路由组件
+
+- 使用`keep-alive`包裹`<router-link>`，可以配置`include=组件名`，可以写成数组`:include=['组件1', '组件2']`
+
+### 路由组件生命周期
+
+- 若在`keep-alive`包裹的组件，设置`setInterval`，那么组件切换时，定时器仍然执行
+- `activated`
+- `deactivated`
+
+### 路由守卫
+
+- 全局前置路由守卫：`router.beforeEach((to, from, next) => {})`初始化路由以及每一次路由切换之前都会执行`beforeEach`里面的回调函数，必须调用`next()`才能往后执行；强调的是路由切换
+  - 如果每一个`to`进行权限判断，效率较低，可以在`router`配置时给路由加一个配置，在`meta`中配置一个权限参数，例如`meta:{ isAuth: false }`，直接判断`to.meta.isAuth`即可
+- 全局后置路由守卫：`router.afterEach((to, from) => {})`初始化路由以及每一次路由切换之后都会执行`afterEach`里面的回调函数；强调的是路由切换
+  - 例如：更改`document.title`
+    - 默认项得在`index.html`中的`<title>`中更改，如果是读取`package.json`的`name`，则需要更改`name`
+    - 其他路由应该在`router.afterEach`中`document.title = to.meta.title || '默认名'`
+- 独享路由守卫：直接配置在路由中`beforeEnter: (to, from, next) => {}`，写逻辑，只对该路由进行权限限制；只有前置没有后置
+- 组件内路由守卫：在组件内，强调的是组件更改
+  - `beforeRouteEnter(to, from, next)`：通过路由规则（必须是切换路由），进入该组件时被调用，需要调用`next()`
+  - `beforeRouteLeave(to, from, next)`：通过路由规则（必须是切换路由），离开该组件时被调用，需要调用`next()`
+
+### 路由工作模式
+
+- `hash`模式：`hash`不会作为路径的一部分发送给服务端；部署到后端只有`index.html`，所以路由点击跳转没问题，一旦跳转后刷新页面就会`404`，需要使用`hash`
+- `history`模式：解决`404`问题，需要后端配置，例如`connect-history-api-fallback`
+
+```javascript
+// main.js
+import VueRouter from 'vue-router'
+import router from './router/index'
+Vue.use(VueRouter)
+new Vue({
+  el: '#app',
+  render: h => h(App),
+  router
+})
+
+// router/index.js 创建整个应用的路由器
+import VueRouter from 'vue-router'
+import About from '../components/About'
+export default new Router({
+  routes: [
+    {
+      path: '/about',
+      component: About
+    },
+    {
+      path: '/home',
+      component: Home,
+      children: [{
+        path: 'news',
+        component: News
+     }]
+    }
+  ]
+})
+```
+
+## Vue3
+
+- 性能提升
+  - 打包大小减少
+  - 渲染更快
+  - 内存减少
+- 源码
+  - 使用`proxy`
+  - 重写虚拟`DOM`和`tree-shaking`
+- 支持`ts`
+- 新特性
+
+### 创建工程
+
+- `@vue-cli`版本在`4.5.0`以上
+- 使用`vite`
+  - 无需打包，快速冷启动
+  - 轻量快速的热重载
+  - 真正的按需编译，不再等待整个应用编译完成
+
+```javascript
+// 引入的不再是Vue的构造函数了，引入的是一个名为createApp的工厂函数
+import { createApp } from 'vue'
+import App from 'App.vue'
+// const app = createApp(App)类似于vue2中的new vue创建的vm，但是app更轻
+createApp(App).mount('#app')
+// 不兼容vue2的new Vue写法
+```
+
+- 可以没有根标签了
