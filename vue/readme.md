@@ -468,7 +468,7 @@ export default{
 
 ### 指令
 
-- `v-text`等价于差值语法 
+- `v-text`等价于差值语法
 - `v-html`，容易导致`xss`攻击，可以给`cookie`设置`HttpOnly`，就不可以通过`js`脚本的`document.cookie`获取了，不要在表单上使用
 - `v-pre`：可以用它跳过没有使用指令语法、插值语法的节点，会加快编译
 - `v-cloak`：网速过慢时，配合`css`实现脚本还未加载时插值语句不显示`[v-cloak]{display: none}`，`vue`请求回来执行时会将元素上的`v-cloak`删除
@@ -549,7 +549,7 @@ export default{
       }
       ```
 
-- `vue-resource`：插件，`vue.use(vueResource)`，`vm`上多了`$http `
+- `vue-resource`：插件，`vue.use(vueResource)`，`vm`上多了`$http`
 
 ## 原理
 
@@ -1066,6 +1066,7 @@ const p = new Proxy(person, {
   }
 })
 ```
+
 ### 计算属性
 
 - 继续使用`computed`是可以的，但不推荐
