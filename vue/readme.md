@@ -26,7 +26,7 @@
 
 - 属性绑定动态值：`v-bind:属性='变量'`或`:属性 ='变量'`，单向数据绑定
 - 双向数据绑定：`v-model`，只能应用到有`value`的表单类元素上，可以使用`v-model`代替`checkbox`的`:checked`和`@change`，但是这样会报错，而且提示要加`sync`
-- 动态参数：`<a v-bind:[attributeName]="url"> ... </a>`，如果`Vue`实例有一个`data property attributeName`，其值为`"href"，那么这个绑定将等价于 v-bind:href。
+- 动态参数：`<a v-bind:[attributeName]="url"> ... </a>`，如果`Vue`实例有一个`data property attributeName`，其值为`"href"`，那么这个绑定将等价于`v-bind:href`
 
 ## 计算属性和侦听器
 
@@ -95,6 +95,26 @@ watch{
 - 监听器需要存在一个属性作为变化的更改，而计算属性直接定义了这个属性，不需要原本就存在
 - 如果需要延迟执行等需求的时候，无法使用计算属性，计算属性是无法开启异步任务的，因为它需要返回值
 
+```javascript
+// 实现搜索过滤功能
+// 1. 监听器实现
+watch: {
+  keyWord: {
+    // 为了初始化显示全量列表，先执行一遍为空时的搜索
+    immediate: true,
+    handler(val) {
+      this.filPersons = this.persons.filter((p) => p.name.indexOf(val) !== -1)
+    }
+  }
+}
+// 2. 计算属性实现
+computed: {
+  filPersons() {
+    return this.persons.filter((p) => p.name.indexOf(this.keyWord) !== -1)
+  }
+}
+```
+
 ## Class与Style绑定
 
 - `<div class='basic' :class='color'>`，可以存在`class`以及`:class`
@@ -106,8 +126,8 @@ watch{
 
 ## 条件渲染
 
-- `v-show`：`display:none`，不占空间的隐藏元素，切换频率高的情况下使用
-- `v-if`：元素也不存在
+- `v-show`：`display:none`，不占空间的隐藏元素，元素还存在，切换频率高的情况下使用
+- `v-if`：元素不存在
 - `v-else`、`v-else-if`
 - 多个判断可以在外层加`<template>`，只能和`v-if`配合使用
 
@@ -128,26 +148,6 @@ watch{
   <!-- 如果添加新的元素时，会出现问题，input框错位 -->
   <input type='text'> 
 </li>
-```
-
-```javascript
-// 实现搜索过滤功能
-// 1. 监听器实现
-watch: {
-  keyWord: {
-    // 为了初始化显示全量列表，先执行一遍为空时的搜索
-    immediate: true,
-    handler(val) {
-      this.filPersons = this.persons.filter((p) => p.name.indexOf(val) !== -1)
-    }
-  }
-}
-// 2. 计算属性实现
-computed: {
-  filPersons() {
-    return this.persons.filter((p) => p.name.indexOf(this.keyWord) !== -1)
-  }
-}
 ```
 
 ### 表单输入绑定
