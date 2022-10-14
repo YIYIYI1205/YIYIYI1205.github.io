@@ -1,0 +1,20 @@
+.test, .div .span {
+  border: 1px #f00;
+  background-color: #fdd;
+}
+
+.div {
+  width: 50px;
+  background: red;
+}
+.div .span {
+  background: chartreuse;
+  color: white;
+  height: 50px;
+}
+
+body.firefox .header:before {
+  content: "Hi, Firefox users!";
+}
+
+/*# sourceMappingURL=index.css.map */

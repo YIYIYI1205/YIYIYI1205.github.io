@@ -1,0 +1,24 @@
+$littleWidth: 20px;
+$middleWidth: 30px;
+$width: $littleWidth + $middleWidth; // 变量中可以使用其它变量
+.test{
+    border: 1px #f00;
+    background-color: #fdd;
+}
+@mixin firefox-message($selector) {
+    body.firefox #{$selector}:before {
+      content: "Hi, Firefox users!";
+    }
+  }
+  
+.div{
+    width: $width;
+    background: red;
+    .span{
+        background: chartreuse;
+        color: white;
+        height: $width;
+        @extend .test;
+    }
+}
+@include firefox-message(".header");
