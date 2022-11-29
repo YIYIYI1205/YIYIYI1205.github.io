@@ -3,6 +3,7 @@
 - 2.vue
   - [1.vue2](2vue/vue2.md)
   - [2.vue3](2vue/vue3.md)
+  - [3.vue-router](2vue/vue-router.md)
 - JavaScript
   - 1.JavaScript高级程序设计(第4版)
     - [1.简介](javascript/javascriptBook/readme.md)

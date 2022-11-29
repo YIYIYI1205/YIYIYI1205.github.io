@@ -25,7 +25,7 @@ export default {
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
+  <h1 id="main">{{ msg }}</h1>
 
   <!-- <button @click="clickMethod">点击</button>
   <input type="text" v-model="count">测试 -->

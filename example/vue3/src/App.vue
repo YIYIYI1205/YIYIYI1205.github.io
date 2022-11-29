@@ -8,6 +8,9 @@ const handleClick = function(params) {
 </script>
 
 <template>
+  <router-link to="/index">首页</router-link>
+  <router-link to="/home">home</router-link>
+  <router-view></router-view>
   <div>
     <a href="https://vitejs.dev" target="_blank">
       <img src="/vite.svg" class="logo" alt="Vite logo" />
