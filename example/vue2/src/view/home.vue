@@ -1,5 +1,9 @@
 <template>
-    <div>{{message}}</div>
+    <div>{{message}}
+    <div>{{$store.state.count}}</div>
+        
+    </div>
+    
 </template>
 <script>
     export default{ 
@@ -10,7 +14,9 @@
             }
         },
         mounted() {
-            console.log(this.$route)
+            console.log(this.$route, 123)
+            console.log(this.$store)
+            this.$store.dispatch('increment', 10)
         }
     }
 </script>
