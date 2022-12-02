@@ -9,7 +9,10 @@ const handleClick = function(params) {
 
 <template>
   <router-link to="/index">首页</router-link>
+  <br />
   <router-link to="/home">home</router-link>
+  <br />
+  <router-link to="/pinia">pinia</router-link>
   <router-view></router-view>
   <div>
     <a href="https://vitejs.dev" target="_blank">
