@@ -6,6 +6,7 @@
   - [3.vue-router](2vue/vue-router.md)
   - [4.vuex](2vue/vuex.md)
   - [5.pinia](2vue/pinia.md)
+  - [6.vite](2vue/vite.md)
 - JavaScript
   - 1.JavaScript高级程序设计(第4版)
     - [1.简介](javascript/javascriptBook/readme.md)
