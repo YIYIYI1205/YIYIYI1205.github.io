@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="box"></div>
     <table border="1">
       <tr>
         <th>标题</th>
@@ -57,7 +58,13 @@ export default {
           text2: 33,
         },
       ],
+      test: "1212"
     };
   },
 };
 </script>
+<style>
+.box{
+  background: red;
+}
+</style>

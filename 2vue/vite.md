@@ -153,7 +153,7 @@ export default{
 - `config`: 修改`vite`配置
 - `configResolved`: `vite`配置确认，只能读不能改
 - `configServer`: 用于配置`dev server`，可以做中间件，例如实现`viteMockServe`
-- `t`ransformIndexHtml`: 用于修改宿主页面
+- `transformIndexHtml`: 用于修改宿主页面
 - `resolveId`: 确定插件名字，是否接管
 - `load`: 接管后返回什么
 - `transform`: 将`load`进来的代码块进一步加工处理
