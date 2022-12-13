@@ -29,11 +29,11 @@
   - 独占一行
   - 可以修改高宽
   - 不设置宽度，块级元素的宽度是它的父元素内容的宽度，高度是自身内容的高度
-- 行内元素：`span`、`a`、`strong`、`i`、`em`、`s`、`u`、`textarea`、`input`、`select`、`label`、`img`、`sup`、`sub`
+- 行内元素：`span`、`a`、`strong`、`i`、`em`、`s`、`u`、`textarea`、`select`、`label`、`sup`、`sub`
   - `display: inline`
   - 不独占一行，和其他内联元素从左到右在一行显示
   - 不能修改高宽，由内容本身决定
-- 行内块
+- 行内块元素：`input`、`img`
   - `display: inline-block`
   - 不独占一行，和其他内联元素从左到右在一行显示
   - 可以修改高宽
@@ -58,12 +58,6 @@
 ## label标签的作用
 
 - label标签来定义表单控制间的关系,当用户选择该标签时，浏览器会自动将焦点转到和标签相关的表单控件上
-
-## 块级元素、行内元素、行内块元素
-
-- 块级元素block：独占一行，能接受宽高，如果不设置默认为父级的100%；<div>、<p>、<h1>...<h6>、<ol>、<ul>、<dl>、<table>、<address>、<blockquote> 、<form>
-- 行内元素inline：与其他行内元素并排，不能设置宽高，默认就是文字的宽高；<a>、<span>、<br>、<i>、<em>、<strong>、<label>、<q>、<var>、<cite>、<code>
-- 行内块inline-block：与其他行内元素并排，可以设置宽高；<input>，<img>
 
 ## a标签中 如何禁用href 跳转页面 或 定位链接
 
