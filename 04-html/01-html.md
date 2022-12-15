@@ -1,5 +1,7 @@
 # html
 
+## emmet语法
+
 - `ul>li*8`
 
 ## 浏览器
@@ -49,32 +51,42 @@
 - 存储：`localStorage`、`sessionStorage`
 - `websocket`：持久性连接，并进行双向数据传输
 - 选择器：`document.querySelector()`、`document.querySelectorAll()`
+- 类名操作：
+  - `Node.classList.add("class")`
+  - `Node.classList.remove("class")`
+  - `Node.classList.toggle("class")`切换`class`，有则移除，无则添加
+  - `Node.classList.contains("class")`检测是否存在`class`
 
-## meta viewport
+## DOCTYPE(⽂档类型) 的作⽤
+
+- 它的目的是告诉浏览器（解析器）应该以什么样（`html`或`xhtml`）的文档类型定义来解析文档
+
+## 具体标签
+
+### meta viewport
 
 - 适配移动端，可以控制视口的大小和比例：
   `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale-1, minimum-scale=1">`
 
-## label标签的作用
+### label标签的作用
 
-- label标签来定义表单控制间的关系,当用户选择该标签时，浏览器会自动将焦点转到和标签相关的表单控件上
+- `label`标签来定义表单控制间的关系，当用户选择该标签时，浏览器会自动将焦点转到和标签相关的表单控件上
 
-## a标签中 如何禁用href 跳转页面 或 定位链接
+### a标签禁用href跳转
 
-- e.preventDefault(); 或者 href="javascript:void(0);
+- `e.preventDefault()`或者`href="javascript:void(0)`
 
-## src和href的区别
+### src和href的区别
 
-- src： 表示对资源的引用，它指向的内容会嵌入到当前标签所在的位置。src会将其指向的资源下载并应⽤到⽂档内，如请求js脚本。当浏览器解析到该元素时，会暂停其他资源的下载和处理，直到将该资源加载、编译、执⾏完毕，所以⼀般js脚本会放在页面底部。
-- href： 表示超文本引用，它指向一些网络资源，建立和当前元素或本文档的链接关系。当浏览器识别到它他指向的⽂件时，就会并⾏下载资源，不会停⽌对当前⽂档的处理。 常用在a、link等标签上。
+- `src`：表示对资源的引用，它指向的内容会嵌入到当前标签所在的位置。`src`会将其指向的资源下载并应⽤到⽂档内，如请求`js`脚本。当浏览器解析到该元素时，会暂停其他资源的下载和处理，直到将该资源加载、编译、执⾏完毕，所以⼀般`js`脚本会放在页面底部
+- `href`：表示超文本引用，它指向一些网络资源，建立和当前元素或本文档的链接关系。当浏览器识别到它他指向的⽂件时，就会并⾏下载资源，不会停⽌对当前⽂档的处理。常用在`a`、`link`等标签上。
 
-## DOCTYPE(⽂档类型) 的作⽤
+### script标签中defer和async的区别
 
-- 它的目的是告诉浏览器（解析器）应该以什么样（html或xhtml）的文档类型定义来解析文档
+- `defer`和`async`属性都是去异步加载外部的`JS`脚本文件，它们都不会阻塞页面的解析，其区别如下：
+  - 执行顺序：多个带`async`属性的标签，不能保证加载的顺序；多个带`defer`属性的标签，按照加载顺序执行；
+  - 脚本是否并行执行：`async`属性，异步加载，加载完立刻执行，再加载后面的；`defer`属性，加载后续文档的过程和`js`脚本的加载（此时仅加载不执行）是并行进行的（异步），`js`脚本需要等到文档所有元素解析完成之后才执行，`DOMContentLoaded`事件触发执行之前
 
-## script标签中defer和async的区别
+### 特殊字符
 
-- defer 和 async属性都是去异步加载外部的JS脚本文件，它们都不会阻塞页面的解析，其区别如下：
-
-  - 执行顺序： 多个带async属性的标签，不能保证加载的顺序；多个带defer属性的标签，按照加载顺序执行；
-  - 脚本是否并行执行：async属性，异步加载，加载完立刻执行，再加载后面的；defer属性，加载后续文档的过程和js脚本的加载(此时仅加载不执行)是并行进行的(异步)，js脚本需要等到文档所有元素解析完成之后才执行，DOMContentLoaded事件触发执行之前。
+- 空格：`&nbsp;`
