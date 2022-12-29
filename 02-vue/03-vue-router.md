@@ -128,7 +128,7 @@
 
 ### 组合式API
 
-- `import { useRouter, useRoute } from 'vue-router'`
+- `import { useRouter, useRoute } from 'vue-router'`，跳转路由使用`useRouter().push()`
 - 守卫`import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'`
 
 ### 滚动行为
