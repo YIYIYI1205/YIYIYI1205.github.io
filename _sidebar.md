@@ -12,8 +12,9 @@
 - [3.工具](03-utils/01-vscode.md)
   - [1.vscode](03-utils/01-vscode.md)
   - [2.git](03-utils/02-git.md)
-- [4.html](04-html/01-html.md)
-- JavaScript
+- [4.HTML](04-html/01-html.md)
+- [5.JavaScript](05-javascript/01-javascript.md)
+  - [1.JavaScript](05-javascript/01-javascript.md)
   - 1.JavaScript高级程序设计(第4版)
     - [1.简介](javascript/javascriptBook/readme.md)
     - [2.script标签](javascript/javascriptBook/script.md)

@@ -129,13 +129,6 @@ store.dispatch(actions.increase()) // {count: 3}
 
 ## javascript
 
-### 数据类型
-
-- 基本数据类型变量保存在栈内存中，因为基本数据类型占用空间小、大小固定，通过值来访问，属于被频繁使用的数据。
-- typeof 可以检测变量的数据类型，返回如下6种字符串number、string、boolean、object、undefined、function
-- obj instanceof Object
-- Object.prototype.toString.call(obj).slice(8, -1) // Object Array Function
-
 ### Array、String 基础
 
 - `Array.prototype.reduce((previousValue, currentValue, currentIndex, array), initialValue)`，第一个参数回调函数，里面传之前的返回值和现在的`value`，第二个参数时初始值
