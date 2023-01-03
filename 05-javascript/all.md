@@ -1,6 +1,6 @@
 # javascript面试
 
-- `for of`可以`return`
+
 
 ## 正则表达式[没看]
 

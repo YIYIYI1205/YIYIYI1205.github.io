@@ -6,7 +6,7 @@
 - Next.js
 - React Hooks
 - Webpack
-- TS 
+- TS
 - Node还没看完
 - Vite
 - react-router6
@@ -34,18 +34,3 @@
 
 es6
 es2020
-
-
-
-
-
-
-
-
-掌握
-1. typescript   2022.3.10-2022.3.22
-2. css权威指南  2022.4.6-2022.
-
-
-sass 2022.11.8
-vue2 2022.11.9-
