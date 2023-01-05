@@ -34,3 +34,16 @@
 
 es6
 es2020
+
+umi
+
+immer reselect
+redux-saga
+next.js
+qiankun
+f2
+G2PLOT
+G6
+freecodeCamp
+
+nginx
